@@ -1,0 +1,34 @@
+.IntroductionContainer
+{
+    border: 2px solid rgba(142, 141, 141, 0.5); 
+    padding : 2%;
+    margin:1px;
+}
+
+.IntroductionContainer p{
+    font-size: 14px;
+}
+.IntroductionContainer h4{
+    font-size: 14px;
+    font-weight: 600;
+    margin : 0;
+}
+
+.introductionVideo{
+    padding-top: 3%;
+    display : flex;
+    align-content: space-between;
+    align-items: center;
+}
+
+ .introductionVideo p{
+   margin-top:3%;
+   margin-left: 3%;
+}
+
+
+.IntroductionContainer img{
+    /* padding-right: 10px; */
+    height : 40px;
+    width : 40px;
+}
