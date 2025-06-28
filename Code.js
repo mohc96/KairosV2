@@ -7,8 +7,14 @@ function onOpen() {
   
   function showSidebar() {
     const html = HtmlService.createHtmlOutputFromFile('Sidebar')
-      .setTitle('React Sidebar')
+      .setTitle(" ")
       .setWidth(400);
     DocumentApp.getUi().showSidebar(html);
   }
+
+  function getUserEmail() {
+    return Session.getActiveUser().getEmail();
+  }
+  
+  
   
