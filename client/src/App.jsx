@@ -3,6 +3,7 @@ import Credentials from './components/Credentials';
 import LogoContainer from './components/LogoContainer';
 import IntroductionContainer from './components/IntroductionContainer';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import SidebarBreakTimer from './components/Break';
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
       <Credentials/>
       <LogoContainer/>
       <IntroductionContainer/>
+      <SidebarBreakTimer />
     </div>
   );
 }
