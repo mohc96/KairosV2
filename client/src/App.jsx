@@ -5,6 +5,9 @@ import IntroductionContainer from './components/IntroductionContainer';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import SidebarBreakTimer from './components/Break';
 import SidebarAdvice from './components/Advice';
+import NewDocCreator from './components/NewDocCreator';
+import MorningPulse from './components/MorningPulse';
+
 
 export default function App() {
   return (
@@ -12,8 +15,11 @@ export default function App() {
       <Credentials/>
       <LogoContainer/>
       <IntroductionContainer/>
+      <MorningPulse/>
       <SidebarAdvice/>
       <SidebarBreakTimer />
+      <NewDocCreator/>
+      
     </div>
   );
 }

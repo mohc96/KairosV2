@@ -7,7 +7,7 @@ function onOpen() {
   
   function showSidebar() {
     const html = HtmlService.createHtmlOutputFromFile('Sidebar')
-      .setTitle(" ")
+      .setTitle("Kairos for Personalized Learning")
       .setWidth(400);
     DocumentApp.getUi().showSidebar(html);
   }
@@ -39,4 +39,33 @@ function onOpen() {
 }
 
   
+function createNewGoogleDoc() {
+  const doc = DocumentApp.create("New Kairos Doc");
+  return doc.getUrl();
+}
+
+
+function processDailyCheckin(payload) {
+
+
+  console.log("this is from processDailyCheckin");
   
+  const url = 'YOUR_API_ENDPOINT/process-daily-checkin';
+ 
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    payload: JSON.stringify(payload)
+  };
+  
+  try {
+    const response = UrlFetchApp.fetch(url, options);
+    return JSON.parse(response.getContentText());
+  } catch (error) {
+    console.error('Error processing daily check-in:', error);
+    throw error;
+  }
+
+}
