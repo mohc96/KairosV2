@@ -7,6 +7,7 @@ import SidebarBreakTimer from './components/Break';
 import SidebarAdvice from './components/Advice';
 import NewDocCreator from './components/NewDocCreator';
 import MorningPulse from './components/MorningPulse';
+import CreateProject from './components/CreateProject';
 
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
       <IntroductionContainer/>
       <MorningPulse/>
       <SidebarAdvice/>
+      <CreateProject/>
       <SidebarBreakTimer />
       <NewDocCreator/>
       
