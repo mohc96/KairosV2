@@ -11,8 +11,6 @@ export default function CreateProject() {
   const [projectOutput, setProjectOutput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasProject, setHasProject] = useState(false);
-  const [hasLockedOnce, setHasLockedOnce] = useState(false);
-
   
   // New states for project editing
   const [projectData, setProjectData] = useState(null);
@@ -240,25 +238,12 @@ export default function CreateProject() {
   };
 
   const lockProject = () => {
-    if (hasLockedOnce) return; // Already locked, don’t allow again
-
-  const confirmed = window.confirm(
-    "Are you sure you want to lock and submit this project for teacher review?\n\n⚠️ You won’t be able to make any further edits."
-  );
-
-  if (!confirmed) return;
-
-  setIsLocked(true);
-  setHasLockedOnce(true);
-  setEditingItem(null);
-  console.log('✅ Project locked and submitted:', projectData);
+    setIsLocked(true);
+    setEditingItem(null);
+    console.log('Project locked and sent for teacher review:', projectData);
   };
 
   const unlockProject = () => {
-    if (hasLockedOnce) {
-    alert("You can't unlock this project after submitting it for review.");
-    return;
-  }
     setIsLocked(false);
   };
 
@@ -294,24 +279,18 @@ export default function CreateProject() {
   };
 
   // Improved Inline Editable Field Component
-    // Improved Inline Editable Field Component
   const InlineEditableField = ({ 
     value, 
     onSave, 
     multiline = false, 
     placeholder = "",
     className = "",
-    displayClassName = "",
-    disabled = false // Optional external lock
+    displayClassName = ""
   }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [tempValue, setTempValue] = useState(value);
 
-    // Respect isLocked or any external disabled flag
-    const isReadOnly = disabled || isLocked;
-
     const handleStart = () => {
-      if (isReadOnly) return;
       setTempValue(value);
       setIsEditing(true);
     };
@@ -382,15 +361,11 @@ export default function CreateProject() {
     }
 
     return (
-      <div 
-        className={`group flex items-start gap-1 ${isReadOnly ? 'cursor-default opacity-70' : 'cursor-pointer'}`} 
-        onClick={handleStart}
-      >
+      <div className="group flex items-start gap-1 cursor-pointer" onClick={handleStart}>
         <div className={`flex-1 ${displayClassName}`}>
           {value || placeholder}
         </div>
-
-        {!isReadOnly && (
+        {!isLocked && (
           <button
             className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-opacity"
             title="Edit"
@@ -402,19 +377,18 @@ export default function CreateProject() {
     );
   };
 
-
   return (
     <div className="w-full max-w-[300px] font-sans">
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm w-full overflow-hidden transition-all duration-200">
         {/* Toggle Button */}
         <div 
           onClick={toggleExpanded} 
-          className="w-full p-3 cursor-pointer transition-colors duration-200 hover:bg-gray-50"
+          className="w-full p-4 cursor-pointer transition-colors duration-200 hover:bg-gray-50"
         >
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <FolderPlus className={`w-5 h-5 ${getStatusClass()}`} />
+                <FolderPlus className={`w-6 h-6 ${getStatusClass()}`} />
                 <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${getStatusDot()}`}></div>
               </div>
               <div>
