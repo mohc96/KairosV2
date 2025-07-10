@@ -21,7 +21,8 @@ function onOpen() {
   const payload = {
     action: "actionA",
     payload: {
-      message: prompt
+      message: prompt,
+      email: getUserEmail()
     }
   };
 
@@ -36,6 +37,30 @@ function onOpen() {
   const result = JSON.parse(response.getContentText());
 
   return result.recommendation || "No response available";
+}
+
+function generateProject(prompt) {
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'; // Lambda URL
+
+  const payload = {
+    action: "actionB",
+    payload: {
+      message: prompt,
+      email: getUserEmail(),
+    }
+  };
+
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  const response = UrlFetchApp.fetch(baseUrl, options);
+  const result = JSON.parse(response.getContentText());
+
+  return JSON.stringify(result.json.project) || "No response available";
 }
 
   

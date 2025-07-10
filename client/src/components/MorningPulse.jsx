@@ -11,12 +11,18 @@ export default function SidebarMorningPulse() {
 
   // Energy-based emojis from 1 (low energy) to 5 (high energy)
   const emojis = [
-    { emoji: '😴', level: 1, label: 'Low Energy' },
+    { emoji: '😔', level: 1, label: 'Low Energy' },
     { emoji: '😌', level: 2, label: 'Calm' },
-    { emoji: '😊', level: 3, label: 'Good' },
-    { emoji: '💪', level: 4, label: 'Strong' },
-    { emoji: '🔥', level: 5, label: 'High Energy' }
+    { emoji: '😁', level: 3, label: 'Good' },
+    { emoji: '😎', level: 4, label: 'Strong' },
+    { emoji: '🤩', level: 5, label: 'High Energy' }
   ];
+  const Tooltip = ({ text }) => (
+  <div className="-top-full mb-1 px-2 py-1 text-xs text-white bg-gray-800 rounded shadow-sm z-1 whitespace-nowrap">
+    {text}
+  </div>
+);
+
 
   // Get user email on component mount
   useEffect(() => {
@@ -84,13 +90,13 @@ export default function SidebarMorningPulse() {
   const getStatusClass = () => {
     if (isSubmitted) return 'text-green-600';
     if (isLoading) return 'text-blue-600';
-    return 'text-orange-600';
+    return 'text-gray-600';
   };
 
   const getStatusDot = () => {
     if (isSubmitted) return 'bg-green-500';
     if (isLoading) return 'bg-blue-500';
-    return 'bg-orange-500';
+    return 'bg-gray-500';
   };
 
   return (
@@ -137,7 +143,7 @@ export default function SidebarMorningPulse() {
               <h4 className="text-sm font-semibold text-gray-900 mb-3">How are you feeling today?</h4>
               <div className="flex justify-center space-x-2">
                 {emojis.map((item) => (
-                  <div key={item.level} className="text-center">
+                  <div key={item.level} className="text-center relative group">
                     <button
                       onClick={() => setSelectedEmoji(item.emoji)}
                       className={`w-12 h-12 rounded-full text-2xl transition-all duration-200 ${
@@ -149,10 +155,15 @@ export default function SidebarMorningPulse() {
                     >
                       {item.emoji}
                     </button>
+                    {/* Custom tooltip */}
+                    <div className="absolute left-1/2 -translate-x-1/2 hidden group-hover:block">
+                      <Tooltip text={item.label} />
+                    </div>
                     <div className="text-xs text-gray-500 mt-1">{item.level}</div>
                   </div>
                 ))}
               </div>
+
               <div className="flex justify-between text-xs text-gray-400 mt-2 px-1">
                 <span>Low Energy</span>
                 <span>High Energy</span>
