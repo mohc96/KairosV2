@@ -71,7 +71,6 @@ export default function App() {
       <SidebarAdvice/>
       <CreateProject/>
       <SidebarBreakTimer />
-      <NewDocCreator/>
       
     </div>
   );
