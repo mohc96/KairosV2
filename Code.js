@@ -13,16 +13,33 @@ function onOpen() {
   }
 
   function getUserEmail() {
-    return Session.getActiveUser().getEmail();
+    var user_email = Session.getActiveUser().getEmail();
+    const identity_url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/identity-fetch';
+    const payload = {
+      user_id: user_email,
+    };
+    const options = {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true,  // Important to get response even if it's 401/403 etc.
+    };
+
+    const response = UrlFetchApp.fetch(identity_url, options);
+
+    return {
+      statusCode: response.getResponseCode(),
+      email: user_email
+    }
   }
   function callOpenAI(prompt) {
   const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'; // Lambda URL
 
   const payload = {
-    action: "actionA",
+    action: "advice",
     payload: {
       message: prompt,
-      email: getUserEmail()
+      user_id: getUserEmail()
     }
   };
 
@@ -43,10 +60,10 @@ function generateProject(prompt) {
   const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'; // Lambda URL
 
   const payload = {
-    action: "actionB",
+    action: "createproject",
     payload: {
       message: prompt,
-      email: getUserEmail(),
+      user_id: getUserEmail(),
     }
   };
 
