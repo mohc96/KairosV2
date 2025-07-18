@@ -28,31 +28,14 @@ jobs:
       - name: Install clasp
         run: npm install -g @google/clasp
 
-      - name: Set up clasp credentials
+      - name: Set up service account credentials
         run: |
-          cat > credentials.json << 'EOF'
-          {
-            "web": {
-              "client_id": "${{ secrets.CLASP_CLIENT_ID }}",
-              "project_id": "${{ secrets.CLASP_PROJECT_ID }}",
-              "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-              "token_uri": "https://oauth2.googleapis.com/token",
-              "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-              "client_secret": "${{ secrets.CLASP_CLIENT_SECRET }}"
-            }
-          }
-          EOF
+          echo '${{ secrets.CLASP_SERVICE_ACCOUNT_KEY }}' > service-account.json
 
-      - name: Login to clasp
+      - name: Login to clasp with service account
         run: |
-          # For CI/CD, we need to use a service account or OAuth2 flow
-          # For now, we'll use a placeholder - you'll need to get access tokens
-          echo "Please set up proper authentication for clasp in CI/CD"
-          echo "You can either:"
-          echo "1. Use a service account key (recommended)"
-          echo "2. Use OAuth2 with refresh tokens"
-          echo "3. Use GitHub OIDC"
-          exit 1
+          export GOOGLE_APPLICATION_CREDENTIALS=service-account.json
+          clasp login --creds service-account.json
 
       - name: Push to Google Apps Script
         run: |
