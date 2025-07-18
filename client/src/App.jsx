@@ -5,7 +5,6 @@ import IntroductionContainer from './components/IntroductionContainer';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import SidebarBreakTimer from './components/Break';
 import SidebarAdvice from './components/Advice';
-import NewDocCreator from './components/NewDocCreator';
 import MorningPulse from './components/MorningPulse';
 import CreateProject from './components/CreateProject';
 import { ShieldX } from 'lucide-react';
