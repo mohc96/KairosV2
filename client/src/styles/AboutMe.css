@@ -1,0 +1,108 @@
+/* Wrapper */
+.aboutme-wrapper {
+  width: 100%;
+  font-family: sans-serif;
+}
+
+/* Single Card Container */
+.aboutme-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  width: 100%;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+/* Toggle Section */
+.aboutme-toggle {
+  width: 100%;
+  padding: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.aboutme-toggle:hover {
+  background-color: #f9fafb;
+}
+
+.aboutme-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.aboutme-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status-icon {
+  position: relative;
+}
+
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.chevron {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #9ca3af;
+  transition: transform 0.2s ease;
+}
+
+.rotate {
+  transform: rotate(180deg);
+}
+
+.title {
+  font-weight: 500;
+  color: #111827;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.aboutme-panel {
+  margin-top: 0;
+  border-top: 1px solid #f3f4f6;
+}
+
+.panel-body {
+  padding: 1rem;
+}
+
+.aboutme-options {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  width: 100%;
+}
+
+.aboutme-option {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 1.25rem;
+  color: #222;
+  cursor: pointer;
+  padding: 0.5rem 0 0.5rem 0.25rem;
+  transition: background 0.15s;
+  border-radius: 0.5rem;
+}
+
+.aboutme-option:hover {
+  background: #f3f4f6;
+}
+
+.aboutme-icon {
+  width: 2.2rem;
+  height: 2.2rem;
+  color: #222;
+} 

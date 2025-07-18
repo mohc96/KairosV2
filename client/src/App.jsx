@@ -8,7 +8,7 @@ import SidebarAdvice from './components/Advice';
 import NewDocCreator from './components/NewDocCreator';
 import MorningPulse from './components/MorningPulse';
 import CreateProject from './components/CreateProject';
-
+import AboutMe from './components/AboutMe';
 
 export default function App() {
   return (
@@ -16,12 +16,12 @@ export default function App() {
       <Credentials/>
       <LogoContainer/>
       <IntroductionContainer/>
+      <AboutMe/>
       <MorningPulse/>
       <SidebarAdvice/>
       <CreateProject/>
       <SidebarBreakTimer />
       <NewDocCreator/>
-      
     </div>
   );
 }
