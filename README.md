@@ -7,7 +7,7 @@ Welcome to **Kairos V2** – a collaborative Google Apps Script project now mana
 
 ## 📂 Repository Link
 
-👉 [https://github.com/venkatasai7/KairosV2](https://github.com/venkatasai7/KairosV2)
+👉 [https://github.com/yadvendranaveen/KairosV2](https://github.com/yadvendranaveen/KairosV2)
 
 ---
 
@@ -111,9 +111,9 @@ This project uses a **hybrid trunk-based deployment** approach with manual deplo
 
 ### **Deployment Flow**
 ```
-Feature Branch → staging → main → Production
-     ↓            ↓        ↓         ↓
-   Develop    Test/QA   Deploy   Live Users
+Branch:Feature: Branch → staging → main 
+                 ↓          ↓        ↓     
+Use Case:       Develop   Test/QA   Deploy  
 ```
 
 ### **Manual Deployment Process**
@@ -165,35 +165,6 @@ Feature Branch → staging → main → Production
    clasp push
    clasp deploy
    ```
-
-### **Environment Management**
-
-#### **Staging Environment**
-- Used for integration testing
-- QA and demo purposes
-- Safe environment for testing new features
-
-#### **Production Environment**
-- Live user environment
-- Only stable, tested code
-- Manual deployment from `main` branch
-
-### **Deployment Commands Reference**
-
-```bash
-# Install clasp globally
-npm install -g @google/clasp
-
-# Login to clasp
-clasp login
-
-# Push to Apps Script
-clasp push
-
-# Deploy to create new version
-clasp deploy
-```
-
 ---
 
 Happy coding! 🎉
