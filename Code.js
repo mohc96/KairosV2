@@ -27,9 +27,13 @@ function onOpen() {
 
     const response = UrlFetchApp.fetch(identity_url, options);
 
+    const responseText = response.getContentText();
+    const responseJson = JSON.parse(responseText);
+
     return {
       statusCode: response.getResponseCode(),
-      email: user_email
+      email: user_email,
+      role: responseJson.role
     }
   }
   function callOpenAI(prompt) {
@@ -110,4 +114,22 @@ function processDailyCheckin(payload) {
     throw error;
   }
 
+}
+
+function getStudentProjectsForTeacher() {
+  // Mocked data - replace with real data fetch from Sheets or DB
+  return [
+    {
+      title: 'Climate Change Research',
+      studentEmail: 'student1@example.com',
+      summary: 'A summary of key climate change challenges and mitigation strategies.',
+      docLink: 'https://docs.google.com/document/d/xxxxxxx',
+    },
+    {
+      title: 'AI in Healthcare',
+      studentEmail: 'student2@example.com',
+      summary: 'Exploring applications of machine learning in medical diagnosis.',
+      docLink: 'https://docs.google.com/document/d/yyyyyyy',
+    },
+  ];
 }
