@@ -43,7 +43,7 @@ function onOpen() {
     action: "advice",
     payload: {
       message: prompt,
-      user_id: getUserEmail()
+      user_id: Session.getActiveUser().getEmail()
     }
   };
 
@@ -56,6 +56,7 @@ function onOpen() {
 
   const response = UrlFetchApp.fetch(baseUrl, options);
   const result = JSON.parse(response.getContentText());
+  Logger.log(result)
 
   return result.recommendation || "No response available";
 }
@@ -67,7 +68,7 @@ function generateProject(prompt) {
     action: "createproject",
     payload: {
       message: prompt,
-      user_id: getUserEmail(),
+      user_id: Session.getActiveUser().getEmail(),
     }
   };
 
