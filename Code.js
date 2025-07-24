@@ -11,9 +11,6 @@ function onOpen() {
       .setWidth(400);
     DocumentApp.getUi().showSidebar(html);
   }
-  function ninja(){
-
-  }
 
   function getUserEmail() {
     var user_email = Session.getActiveUser().getEmail();
