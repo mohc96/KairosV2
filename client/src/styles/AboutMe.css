@@ -61,49 +61,47 @@
   margin-top: 10px;
 }
 .aboutme-form-label {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #334155;
-  margin-bottom: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  font-size: 0.875rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 .aboutme-form-input {
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 1rem;
-  color: #334155;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  color: #374151;
   background: #f8fafc;
-  margin-top: 4px;
+  margin-top: 0;
   outline: none;
   transition: border 0.2s;
 }
 .aboutme-form-input:focus {
-  border: 1.5px solid #64748b;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px #c7d2fe;
   background: #fff;
 }
 
 .aboutme-form-submit {
   margin-top: 8px;
   width: 100%;
-  background: #94a3b8;
-  color: #fff;
+  background: #4f46e5;
+  color: white;
   font-weight: 500;
-  font-size: 1.08rem;
+  font-size: 0.875rem;
   border: none;
-  border-radius: 8px;
-  padding: 12px 0 12px 0;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  transition: background 0.18s;
+  transition: background 0.2s;
 }
 .aboutme-form-submit:hover {
-  background: #64748b;
+  background: #4338ca;
 }
 .aboutme-form-submit-icon {
   width: 22px;
