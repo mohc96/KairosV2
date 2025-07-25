@@ -13,16 +13,37 @@ function onOpen() {
   }
 
   function getUserEmail() {
-    return Session.getActiveUser().getEmail();
+    var user_email = Session.getActiveUser().getEmail();
+    const identity_url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/identity-fetch';
+    const payload = {
+      email_id: user_email,
+    };
+    const options = {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true,  // Important to get response even if it's 401/403 etc.
+    };
+
+    const response = UrlFetchApp.fetch(identity_url, options);
+
+    const responseText = response.getContentText();
+    const responseJson = JSON.parse(responseText);
+
+    return {
+      statusCode: response.getResponseCode(),
+      email: user_email,
+      role: responseJson.role
+    }
   }
   function callOpenAI(prompt) {
   const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'; // Lambda URL
 
   const payload = {
-    action: "actionA",
+    action: "advice",
     payload: {
       message: prompt,
-      email: getUserEmail()
+      email_id: Session.getActiveUser().getEmail()
     }
   };
 
@@ -35,6 +56,7 @@ function onOpen() {
 
   const response = UrlFetchApp.fetch(baseUrl, options);
   const result = JSON.parse(response.getContentText());
+  Logger.log(result)
 
   return result.recommendation || "No response available";
 }
@@ -43,10 +65,10 @@ function generateProject(prompt) {
   const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'; // Lambda URL
 
   const payload = {
-    action: "actionB",
+    action: "createproject",
     payload: {
       message: prompt,
-      email: getUserEmail(),
+      email_id: Session.getActiveUser().getEmail(),
     }
   };
 
@@ -63,11 +85,6 @@ function generateProject(prompt) {
   return JSON.stringify(result.json.project) || "No response available";
 }
 
-  
-function createNewGoogleDoc() {
-  const doc = DocumentApp.create("New Kairos Doc");
-  return doc.getUrl();
-}
 
 
 function processDailyCheckin(payload) {
@@ -93,4 +110,22 @@ function processDailyCheckin(payload) {
     throw error;
   }
 
+}
+
+function getStudentProjectsForTeacher() {
+  // Mocked data - replace with real data fetch from Sheets or DB
+  return [
+    {
+      title: 'Climate Change Research',
+      studentEmail: 'student1@example.com',
+      summary: 'A summary of key climate change challenges and mitigation strategies.',
+      docLink: 'https://docs.google.com/document/d/xxxxxxx',
+    },
+    {
+      title: 'AI in Healthcare',
+      studentEmail: 'student2@example.com',
+      summary: 'Exploring applications of machine learning in medical diagnosis.',
+      docLink: 'https://docs.google.com/document/d/yyyyyyy',
+    },
+  ];
 }

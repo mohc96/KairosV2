@@ -7,7 +7,7 @@ Welcome to **Kairos V2** – a collaborative Google Apps Script project now mana
 
 ## 📂 Repository Link
 
-👉 [https://github.com/venkatasai7/KairosV2](https://github.com/venkatasai7/KairosV2)
+👉 [https://github.com/yadvendranaveen/KairosV2](https://github.com/yadvendranaveen/KairosV2)
 
 ---
 
@@ -96,6 +96,75 @@ To gain access, you may request it from any of the following:
 - **Do not push directly to `main`** unless you’re authorized.
 - Follow proper Git hygiene: pull before coding, branch off `main`, use meaningful commit messages, and open PRs for all changes.
 
+---
+
+---
+
+## 🚀 Deployment Strategy
+
+This project uses a **hybrid trunk-based deployment** approach with manual deployment processes.
+
+### **Branch Strategy**
+- **`main`**: Production-ready code, deployed to production
+- **`staging`**: Integration testing branch, deployed to staging environment
+- **Feature branches**: Short-lived branches for development
+
+### **Deployment Flow**
+```
+Branch:Feature: Branch → staging → main 
+                 ↓          ↓        ↓     
+Use Case:       Develop   Test/QA   Deploy  
+```
+
+### **Manual Deployment Process**
+
+#### **Development Workflow**
+1. **Create feature branch**
+   ```bash
+   git checkout -b feature/new-feature
+   ```
+
+2. **Make changes and commit**
+   ```bash
+   git add .
+   git commit -m "feat: add new feature"
+   git push origin feature/new-feature
+   ```
+
+3. **Merge to staging for testing**
+   ```bash
+   git checkout staging
+   git merge feature/new-feature
+   git push origin staging
+   ```
+
+4. **Deploy to staging environment**
+   ```bash
+   # Install clasp globally
+   npm install -g @google/clasp
+   
+   # Login to clasp
+   clasp login
+   
+   # Push to Apps Script
+   clasp push
+   
+   # Deploy to create new version
+   clasp deploy
+   ```
+
+5. **After testing, merge to main for production**
+   ```bash
+   git checkout main
+   git merge staging
+   git push origin main
+   ```
+
+6. **Deploy to production**
+   ```bash
+   clasp push
+   clasp deploy
+   ```
 ---
 
 Happy coding! 🎉

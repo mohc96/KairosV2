@@ -22,6 +22,21 @@ export default function CreateProject() {
   const [editingItem, setEditingItem] = useState(null);
   const [expandedStages, setExpandedStages] = useState({});
   const [view, setView] = useState('text'); // 'text' or 'structured'
+  const [selectedSubject, setSelectedSubject] = useState('');
+  const [showSubjectDropdown, setShowSubjectDropdown] = useState(false);
+  const [subjectError, setSubjectError] = useState(false);
+
+  // Add this subjects array after your state declarations
+  const subjects = [
+    { value: 'mathematics', label: 'Mathematics' },
+    { value: 'science', label: 'Science' },
+    { value: 'english', label: 'English' },
+    { value: 'history', label: 'History' },
+    { value: 'art', label: 'Art' },
+    { value: 'technology', label: 'Technology' },
+    { value: 'other', label: 'Other' }
+  ];
+
 
   const toggleExpanded = () => setIsExpanded(!isExpanded);
 
@@ -29,6 +44,9 @@ export default function CreateProject() {
   const closeDialog = () => {
     setShowDialog(false);
     setUserInput('');
+    setSelectedSubject('');
+    setShowSubjectDropdown(false);
+    setSubjectError(false);
   };
 
   // Check if data has been edited
@@ -39,93 +57,42 @@ export default function CreateProject() {
     }
   }, [projectData, originalData]);
 
+  useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (showSubjectDropdown && !event.target.closest('.relative')) {
+      setShowSubjectDropdown(false);
+    }
+  };
+
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, [showSubjectDropdown]);
+
   const handleSubmit = async () => {
     if (!userInput.trim()) return;
+
+    if (!selectedSubject) {
+      setSubjectError(true);
+      return;
+    }
 
     setIsLoading(true);
     setProjectOutput('');
     setShowDialog(false);
+    setSubjectError(false);
 
     try {
       // Call your Google Apps Script function
+      const promptWithSubject = `${userInput} (Subject: ${subjects.find(s => s.value === selectedSubject)?.label})`;
       const result = await new Promise((resolve, reject) => {
         if (typeof google !== 'undefined' && google.script) {
           google.script.run
             .withSuccessHandler(resolve)
             .withFailureHandler(reject)
-            .generateProject(userInput);
-        } else {
-          // Fallback for testing - replace with actual mock data structure
-          setTimeout(() => {
-            const mockResult = {
-              "stages": [
-                {
-                  "stage_id": "fd3b1d41-7553-4ec0-831a-12cb753f32e2",
-                  "stage_order": 1,
-                  "title": "Stage 1: Planning",
-                  "tasks": [
-                    {
-                      "task_id": "51b5c504-f9c2-4b7a-9407-d9ee18235f0c",
-                      "title": "Research Requirements",
-                      "description": "Research and define project requirements based on: " + userInput,
-                      "academic_standard": "Research Skills",
-                      "resource_id": {
-                        "label": "Research Guide",
-                        "url": "https://www.example.com/research-guide"
-                      }
-                    },
-                    {
-                      "task_id": "a54a5f2a-947f-4f06-b102-2e5702b7e5b5",
-                      "title": "Create Project Plan",
-                      "description": "Develop a detailed project plan with timelines",
-                      "academic_standard": "Project Management",
-                      "resource_id": {
-                        "label": "Planning Templates",
-                        "url": "https://www.example.com/planning-templates"
-                      }
-                    }
-                  ],
-                  "gate": {
-                    "gate_id": "3baffd4b-570c-45b2-8697-7374affd00fa",
-                    "title": "Planning Review",
-                    "description": "Review and approve the project plan",
-                    "checklist": [
-                      "Requirements are clearly defined",
-                      "Timeline is realistic"
-                    ]
-                  }
-                },
-                {
-                  "stage_id": "c3e384fb-4d2c-47a0-99e1-c9cb356fce0b",
-                  "stage_order": 2,
-                  "title": "Stage 2: Development",
-                  "tasks": [
-                    {
-                      "task_id": "1b136a26-6f57-42c7-a93a-cf07ac51a6df",
-                      "title": "Start Development",
-                      "description": "Begin implementing the project based on the plan",
-                      "academic_standard": "Implementation",
-                      "resource_id": {
-                        "label": "Development Guide",
-                        "url": "https://www.example.com/dev-guide"
-                      }
-                    }
-                  ],
-                  "gate": {
-                    "gate_id": "539d25ff-d255-4f09-92ae-095f5af7a346",
-                    "title": "Development Check",
-                    "description": "Check development progress and quality",
-                    "checklist": [
-                      "Code quality meets standards",
-                      "Progress is on track"
-                    ]
-                  }
-                }
-              ]
-            };
-            resolve(JSON.stringify(mockResult));
-          }, 2000);
-        }
+            .generateProject(promptWithSubject);
+        } 
       });
 
       // Parse the result
@@ -134,7 +101,7 @@ export default function CreateProject() {
       
       try {
         parsedData = JSON.parse(result);
-        textOutput = `Generated project for: ${userInput}\n\nProject includes ${parsedData.stages?.length || 0} stages with structured tasks and gates.`;
+        textOutput = `Subject: ${selectedSubject}\nGenerated project for: ${userInput}\n\nProject includes ${parsedData.stages?.length || 0} stages with structured tasks and gates.`;
         setProjectData(parsedData);
         setOriginalData(JSON.parse(JSON.stringify(parsedData)));
         setView('structured');
@@ -697,6 +664,56 @@ export default function CreateProject() {
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none resize-none"
                 />
               </div>
+
+              <div className="mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Subject <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowSubjectDropdown(!showSubjectDropdown)}
+                    className={`w-full px-3 py-2 text-sm text-left border rounded-lg bg-white hover:bg-gray-50 focus:ring-2 focus:ring-purple-500 outline-none flex items-center justify-between ${
+                      subjectError 
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500' 
+                        : 'border-gray-300 focus:border-purple-500'
+                    }`}
+                  >
+                    <span className={selectedSubject ? 'text-gray-900' : 'text-gray-500'}>
+                      {selectedSubject ? subjects.find(s => s.value === selectedSubject)?.label : 'Select Subject'}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showSubjectDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {subjectError && (
+                    <p className="mt-1 text-xs text-red-600">Please select a subject</p>
+                  )}
+                  
+                  {showSubjectDropdown && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      <div className="py-1">
+                        {subjects.map((subject) => (
+                          <button
+                            key={subject.value}
+                            type="button"
+                            onClick={() => {
+                              setSelectedSubject(subject.value);
+                              setShowSubjectDropdown(false);
+                              setSubjectError(false); // Clear error when subject is selected
+                            }}
+                            className={`w-full px-3 py-2 text-sm text-left hover:bg-gray-100 transition-colors ${
+                              selectedSubject === subject.value ? 'bg-purple-50 text-purple-700' : 'text-gray-700'
+                            }`}
+                          >
+                            {subject.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
 
               <div className="bg-blue-50 border border-blue-200 p-2 rounded-lg">
                 <p className="text-xs text-blue-800">

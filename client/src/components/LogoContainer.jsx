@@ -1,5 +1,5 @@
 import '../styles/LogoContainer.css'
-import logo from "../assets/MindSpark_Logo.PNG"
+import logo from "../assets/MindSparkLogNew.png"
 export default function LogoContainer() {
     return (
         <div className="LogoContainer">
