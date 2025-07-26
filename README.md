@@ -153,15 +153,16 @@ Use Case:       Develop   Test/QA   Deploy
    clasp deploy
    ```
 
-5. **After testing, merge to main for production**
-   ```bash
-   git checkout main
-   git merge staging
-   git push origin main
-   ```
+5. **Create Pull Request for Production Release**
+   - Create a PR from `staging` to `main`
+   - **PR Title**: `Release <date>` (e.g., "Release 2024-01-15")
+   - **Requirement**: At least one approval required before merge
+   - After approval, merge the PR to `main`
 
 6. **Deploy to production**
    ```bash
+   git checkout main
+   git pull origin main
    clasp push
    clasp deploy
    ```
