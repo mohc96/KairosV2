@@ -16,7 +16,7 @@ function onOpen() {
     var user_email = Session.getActiveUser().getEmail();
     const identity_url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/identity-fetch';
     const payload = {
-      user_id: user_email,
+      email_id: user_email,
     };
     const options = {
       method: 'post',
@@ -43,7 +43,7 @@ function onOpen() {
     action: "advice",
     payload: {
       message: prompt,
-      user_id: Session.getActiveUser().getEmail()
+      email_id: Session.getActiveUser().getEmail()
     }
   };
 
@@ -68,7 +68,7 @@ function generateProject(prompt) {
     action: "createproject",
     payload: {
       message: prompt,
-      user_id: Session.getActiveUser().getEmail(),
+      email_id: Session.getActiveUser().getEmail(),
     }
   };
 
@@ -85,11 +85,6 @@ function generateProject(prompt) {
   return JSON.stringify(result.json.project) || "No response available";
 }
 
-  
-function createNewGoogleDoc() {
-  const doc = DocumentApp.create("New Kairos Doc");
-  return doc.getUrl();
-}
 
 
 function processDailyCheckin(payload) {
