@@ -5,6 +5,7 @@ import StudentDashboard from './components/StudentDashboard';
 import TeacherDashboard from './components/TeacherDashboard';
 import UnauthorizedUser from './components/UnauthorizedUser';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Loader from './components/Loader';
 
 export default function App() {
   const [isAuthorized, setIsAuthorized] = useState(null);
@@ -25,7 +26,7 @@ export default function App() {
       .getUserEmail();
   }, []);
 
-  if (isAuthorized === null) return <div>Loading...</div>;
+  if (isAuthorized === null) return <Loader />;
 
   if (!isAuthorized) return <UnauthorizedUser />;
 
