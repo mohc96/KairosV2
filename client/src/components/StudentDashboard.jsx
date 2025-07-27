@@ -4,6 +4,7 @@ import SidebarAdvice from './Advice';
 import CreateProject from './CreateProject';
 import SidebarBreakTimer from './Break';
 import AboutMe from './AboutMe';
+import ExpertSearchComponent from './WhoCanHelp';
 
 export default function StudentDashboard({ email }) {
   return (
@@ -14,6 +15,7 @@ export default function StudentDashboard({ email }) {
       <SidebarAdvice />
       <CreateProject />
       <SidebarBreakTimer />
+      <ExpertSearchComponent />
     </div>
   );
 }
