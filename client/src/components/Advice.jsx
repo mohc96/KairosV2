@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
-  MessageCircle, ChevronDown, Send, Lightbulb, Loader2, X,
+  MessageCircle, ChevronDown, Send, Lightbulb, Loader2,
 } from 'lucide-react';
-import '../styles/Advice.css';
+import '../styles/Advice.css'; // Make sure this matches your file path
 
 export default function SidebarAdvice() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [userInput, setUserInput] = useState('');
+  const [subject, setSubject] = useState('');
   const [advice, setAdvice] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasAdvice, setHasAdvice] = useState(false);
@@ -20,20 +21,24 @@ export default function SidebarAdvice() {
     setIsLoading(true);
     setAdvice('');
 
+    const fullPrompt = subject
+      ? `${userInput}\n\nSubject Area: ${subject}`
+      : userInput;
+
     google.script.run
       .withSuccessHandler((result) => {
-        const adviceText = result || "No response available";
-        setAdvice(adviceText);
+        const isEmpty = !result || result.trim() === '';
+        setAdvice(isEmpty ? '' : result);
         setHasAdvice(true);
         setIsLoading(false);
       })
       .withFailureHandler((error) => {
         console.error('Error calling Apps Script:', error);
-        setAdvice("I'm currently unable to connect to the advice service. Please try again later.");
+        setAdvice('');
         setHasAdvice(true);
         setIsLoading(false);
       })
-      .callOpenAI(userInput);
+      .callOpenAI(fullPrompt);
   };
 
   const handleKeyPress = (e) => {
@@ -45,26 +50,42 @@ export default function SidebarAdvice() {
 
   const handleClear = () => {
     setUserInput('');
+    setSubject('');
     setAdvice('');
     setHasAdvice(false);
   };
 
   const getStatusClass = () => {
-    if (hasAdvice) return 'text-green';
-    if (isLoading) return 'text-blue';
+    if (isLoading) return 'text-yellow';
+    if (hasAdvice && advice && advice.trim() !== 'No response available') return 'text-green';
+    if (hasAdvice && (!advice || advice.trim() === 'No response available')) return 'text-red';
     return 'text-gray';
   };
 
   const getStatusDot = () => {
-    if (hasAdvice) return 'dot-green';
-    if (isLoading) return 'dot-blue';
+    if (isLoading) return 'dot-yellow';
+    if (hasAdvice && advice && advice.trim() !== 'No response available') return 'dot-green';
+    if (hasAdvice && (!advice || advice.trim() === 'No response available')) return 'dot-red';
     return 'dot-gray';
+  };
+
+  const getStatusSubtitle = () => {
+    if (isLoading) return 'Finding real-world connections...';
+    if (hasAdvice && advice && advice.trim() !== 'No response available') return 'Advice ready';
+    if (hasAdvice && (!advice || advice.trim() === 'No response available')) return 'No advice available';
+    return 'Ask for guidance';
+  };
+
+  const getStatusTextColor = () => {
+    if (isLoading) return '#facc15';
+    if (hasAdvice && advice && advice.trim() !== 'No response available') return '#22c55e';
+    if (hasAdvice && (!advice || advice.trim() === 'No response available')) return '#ef4444';
+    return '#6b7280';
   };
 
   return (
     <div className="advice-wrapper">
       <div className="advice-card">
-        {/* Toggle Button */}
         <div onClick={toggleExpanded} className="advice-toggle">
           <div className="advice-header">
             <div className="advice-header-left">
@@ -74,8 +95,8 @@ export default function SidebarAdvice() {
               </div>
               <div>
                 <div className="title">Get Advice</div>
-                <div className="subtitle">
-                  {isLoading ? 'Getting advice...' : hasAdvice ? 'Advice ready' : 'Ask for guidance'}
+                <div className="subtitle" style={{ color: getStatusTextColor() }}>
+                  {getStatusSubtitle()}
                 </div>
               </div>
             </div>
@@ -83,20 +104,36 @@ export default function SidebarAdvice() {
           </div>
         </div>
 
-        {/* Expandable Content */}
         {isExpanded && (
           <div className="advice-panel">
             <div className="panel-body">
               <div className="input-section">
-                <label>What would you like advice about?</label>
+                <label>What concept are you investigating?</label>
                 <textarea
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="I'm struggling with... / I need help deciding... / How do I..."
+                  onKeyDown={handleKeyPress}
+                  placeholder="I'm struggling with... / I need help deciding..."
                   rows="3"
                   disabled={isLoading}
                 />
+                <div className="dropdown-section">
+                  <label htmlFor="subject-select">Select Subject:</label>
+                  <select
+                    id="subject-select"
+                    className="subject-dropdown"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    disabled={isLoading}
+                  >
+                    <option value="">-- Select Subject --</option>
+                    <option value="ELA">ELA</option>
+                    <option value="Math">Math</option>
+                    <option value="Science">Science</option>
+                    <option value="Social Studies">Social Studies</option>
+                  </select>
+                </div>
+
                 <div className="btn-group">
                   <button
                     onClick={handleSubmit}
@@ -106,7 +143,7 @@ export default function SidebarAdvice() {
                     {isLoading ? (
                       <>
                         <Loader2 className="loading-icon animate-spin" />
-                        <span>Getting advice...</span>
+                        <span className="typing-dots">Finding real-world connections<span>.</span><span>.</span><span>.</span></span>
                       </>
                     ) : (
                       <>
@@ -115,38 +152,39 @@ export default function SidebarAdvice() {
                       </>
                     )}
                   </button>
-                  {(userInput || advice) && (
-                    <button onClick={handleClear} className="clear-btn">
-                      Clear
-                    </button>
+                  {(userInput || advice || subject) && (
+                    <button onClick={handleClear} className="clear-btn">Clear</button>
                   )}
                 </div>
               </div>
 
-              {/* Advice Output */}
-              {advice && (
-                <div className="advice-box">
+              
+
+                {/* Only show buttons if advice is non-empty */}
+                
+              {hasAdvice && (
+                <div className={`advice-box ${!advice ? 'text-red' : ''}`}>
                   <div className="advice-content">
                     <Lightbulb className="bulb-icon" />
                     <h4>Advice for you:</h4>
                   </div>
-                  <div className="markdown">
-                    <ReactMarkdown>{advice}</ReactMarkdown>
-                  </div>
-                  <div className="copy-section">
-                    <button onClick={() => navigator.clipboard.writeText(advice)}>
-                      📋 Copy advice to clipboard
-                    </button>
+                  <div className={`markdown ${advice?.trim() === 'No response available' ? 'text-red' : ''}`}>
+                    <ReactMarkdown>{advice || 'No response available'}</ReactMarkdown>
                   </div>
                 </div>
               )}
 
-              {/* Status Text */}
-              <div className={`status ${hasAdvice ? 'green' : isLoading ? 'blue' : 'gray'}`}>
-                {isLoading ? '🤔 Thinking...' : hasAdvice ? '💡 Advice received' : '💭 Ready to help'}
-              </div>
+              {/* Only show buttons if advice is non-empty */}
+              {advice?.trim() && (
+                <div className="copy-section">
+                  <button onClick={() => navigator.clipboard.writeText(advice)}>
+                    📋 Copy advice to clipboard
+                  </button>
+                  <button className="add-btn" onClick={() => alert("✅ Added to your project!")}>➕ Add to Project</button>
+                  <button className="pdf-btn" onClick={() => alert("📄 PDF download is not available yet")}>📄 Download as PDF</button>
+                </div>
+              )}
 
-              {/* Tips */}
               {!advice && !isLoading && (
                 <div className="tips-box">
                   <h5>💡 Tips for better advice:</h5>
@@ -163,4 +201,4 @@ export default function SidebarAdvice() {
       </div>
     </div>
   );
-}
+} 
