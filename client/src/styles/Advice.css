@@ -9,7 +9,7 @@
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   width: 100%;
   overflow: hidden;
   transition: all 0.2s ease;
@@ -57,13 +57,25 @@
   border-radius: 9999px;
 }
 
-.dot-green { background-color: #22c55e; }
-.dot-blue { background-color: #3b82f6; }
-.dot-gray { background-color: #9ca3af; }
+.dot-green {
+  background-color: #22c55e;
+}
+.dot-blue {
+  background-color: #3b82f6;
+}
+.dot-gray {
+  background-color: #9ca3af;
+}
 
-.text-green { color: #16a34a; }
-.text-blue { color: #2563eb; }
-.text-gray { color: #4b5563; }
+.text-green {
+  color: #16a34a;
+}
+.text-blue {
+  color: #2563eb;
+}
+.text-gray {
+  color: #4b5563;
+}
 
 .title {
   font-weight: 500;
@@ -88,45 +100,8 @@
 
 /* Expanded Panel Inside Same Card */
 .advice-panel {
-  margin-top: 0; /* Important: Remove visual separation */
+  margin-top: 0;
   border-top: 1px solid #f3f4f6;
-}
-
-/* Panel Header */
-.panel-header {
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.panel-title {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.panel-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: #4f46e5;
-}
-
-.close-btn {
-  padding: 0.25rem;
-  border-radius: 0.375rem;
-}
-
-.close-btn:hover {
-  background-color: #f3f4f6;
-}
-
-.close-icon {
-  width: 1rem;
-  height: 1rem;
-  color: #6b7280;
 }
 
 /* Panel Body */
@@ -201,7 +176,6 @@
 
 /* Advice Output Box */
 .advice-box {
-  margin: 0.5rem 0;
   margin-top: 1rem;
   border-radius: 0.5rem;
   max-height: 24rem;
@@ -233,24 +207,41 @@
   color: #4338ca;
 }
 
-/* Copy Button */
+/* Unified Button Section (Copy, Add, PDF) */
 .copy-section {
   margin: 1rem 0;
   border-top: 1px solid #c7d2fe;
   padding-top: 0.75rem;
   text-align: left;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .copy-section button {
+  all: unset;
   font-size: 0.75rem;
   color: #4f46e5;
-  background: none;
-  border: none;
+  background-color: transparent;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .copy-section button:hover {
+  background-color: #f3f4f6;
   color: #3730a3;
+}
+
+.copy-section button:disabled {
+  color: #9ca3af;
+  background-color: transparent;
+  cursor: not-allowed;
 }
 
 /* Status Message */
@@ -297,13 +288,93 @@
   margin-bottom: 0.5rem;
 }
 
-
-
+/* Spinner */
 .animate-spin {
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
+
+/* Subject Dropdown */
+.dropdown-section {
+  margin-top: 1rem;
+}
+
+.dropdown-section label {
+  font-size: 0.875rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.subject-dropdown {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  background-color: white;
+  color: #111827;
+}
+
+/* === Enhanced Dot Colors with Glow === */
+.dot-green {
+  background-color: #22c55e;
+  box-shadow: 0 0 6px #22c55e80;
+}
+
+.dot-yellow {
+  background-color: #facc15;
+  box-shadow: 0 0 6px #facc1580;
+}
+
+.dot-red {
+  background-color: #ef4444;
+  box-shadow: 0 0 6px #ef444480;
+}
+
+.dot-gray {
+  background-color: #9ca3af;
+}
+
+/* === Matching Icon Colors === */
+.text-green {
+  color: #22c55e;
+}
+
+.text-yellow {
+  color: #facc15;
+}
+
+.text-red {
+  color: #ef4444;
+}
+
+.text-gray {
+  color: #6b7280;
+}
+
+/* === Typing Dots Animation === */
+.typing-dots span {
+  animation: blink 1s infinite;
+}
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0%, 20% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
