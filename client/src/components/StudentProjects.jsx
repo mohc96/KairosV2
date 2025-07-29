@@ -83,7 +83,7 @@ export default function StudentProjects() {
   };
 
   const getStatusClass = () => {
-    if (isLoading) return 'text-blue-600';
+    if (isLoading) return 'text-yellow-400';
     if (projects.length === 0) return 'text-gray-600';
     return 'text-purple-600';
   };
