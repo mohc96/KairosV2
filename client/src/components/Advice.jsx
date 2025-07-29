@@ -152,7 +152,7 @@ export default function SidebarAdvice() {
                       </>
                     )}
                   </button>
-                  {(userInput || advice || subject) && (
+                  {!isLoading && (userInput || advice || subject) && (
                     <button onClick={handleClear} className="clear-btn">Clear</button>
                   )}
                 </div>
