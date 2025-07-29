@@ -112,6 +112,27 @@ function processDailyCheckin(payload) {
 
 }
 
+function callMorningPulseAPI(payload) {
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
+  
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  try {
+    const response = UrlFetchApp.fetch(baseUrl, options);
+    const result = JSON.parse(response.getContentText());
+    Logger.log('Morning pulse API response:', result);
+    return result;
+  } catch (error) {
+    console.error('Error calling morning pulse API:', error);
+    throw error;
+  }
+}
+
 function getStudentProjectsForTeacher() {
   // Mocked data - replace with real data fetch from Sheets or DB
   return [
