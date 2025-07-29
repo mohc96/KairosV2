@@ -82,7 +82,7 @@ export default function AboutMe() {
     setSubmitStatus(null);
 
     const payload = {
-      action: "aboutme2",
+      action: "aboutme",
       payload: {
         email_id: formData.email_id,
         bio: formData.bio,
@@ -107,7 +107,6 @@ export default function AboutMe() {
       setIsSubmitting(false);
     }, 2000);
 
-    /*
     google.script.run
       .withSuccessHandler((result) => {
         setSubmitStatus('success');
@@ -128,7 +127,6 @@ export default function AboutMe() {
         setIsSubmitting(false);
       })
       .submitFormToScript(payload);
-    */
   };
 
   const toggleExpanded = () => {
