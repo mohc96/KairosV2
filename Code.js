@@ -56,9 +56,8 @@ function onOpen() {
 
   const response = UrlFetchApp.fetch(baseUrl, options);
   const result = JSON.parse(response.getContentText());
-  Logger.log(result)
-
-  return result.recommendation || "No response available";
+  
+  return result.recommendation.advice || "No response available";
 }
 
 function generateProject(prompt) {
