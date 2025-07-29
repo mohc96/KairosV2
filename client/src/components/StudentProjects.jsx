@@ -66,9 +66,11 @@ export default function StudentProjects() {
   const getSubjectColor = (subject) => {
     const colors = {
       'Mathematics': 'bg-blue-100 text-blue-800',
-      'Algebra': 'bg-green-100 text-green-800',
-      'Geometry': 'bg-purple-100 text-purple-800',
+      'English': 'bg-green-100 text-green-800',
+      'History': 'bg-purple-100 text-purple-800',
       'Science': 'bg-orange-100 text-orange-800',
+      'Art': 'bg-yellow-100 text-yellow-800',
+      'Technology': 'bg-red-100 text-red-800',
       'default': 'bg-gray-100 text-gray-800'
     };
     return colors[subject] || colors.default;
