@@ -17,7 +17,7 @@ export default function StudentDashboard({ email }) {
       <CreateProject />
       <SidebarBreakTimer />
       <StudentProjects />
-      {/*<ExpertSearchComponent />*/}
+      <ExpertSearchComponent />
     </div>
   );
 }
