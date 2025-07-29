@@ -112,6 +112,10 @@ function processDailyCheckin(payload) {
 
 }
 
+function submitFormToScript(payload){
+  Logger.log(payload)
+}
+
 function callMorningPulseAPI(payload) {
   const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
   
