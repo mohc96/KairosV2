@@ -37,7 +37,7 @@ function onOpen() {
     }
   }
   function callOpenAI(prompt) {
-  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'; // Lambda URL
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
 
   const payload = {
     action: "advice",
@@ -54,10 +54,28 @@ function onOpen() {
     muteHttpExceptions: true
   };
 
-  const response = UrlFetchApp.fetch(baseUrl, options);
-  const result = JSON.parse(response.getContentText());
-  
-  return result.recommendation.advice || "No response available";
+  try {
+    const response = UrlFetchApp.fetch(baseUrl, options);
+    const result = JSON.parse(response.getContentText());
+
+    Logger.log("🔁 Full advice response:");
+    Logger.log(result);
+
+    // ✅ Return the entire object — not just result.recommendation.advice
+    return result;
+  } catch (error) {
+    Logger.log("❌ Error fetching from OpenAI Lambda:");
+    Logger.log(error);
+    return {
+      recommendation: {
+        advice: "No response available",
+        subject: "",
+        connection: "",
+        examples: [],
+        resources: []
+      }
+    };
+  }
 }
 
 function generateProject(prompt) {
