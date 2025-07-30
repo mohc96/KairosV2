@@ -377,3 +377,33 @@
   50% { opacity: 1; }
   100% { opacity: 0; }
 }
+
+/* === Cleaner Markdown Output for Advice === */
+.markdown {
+  font-size: 0.875rem;
+  color: #334155; /* softer slate gray */
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+
+.markdown h5 {
+  margin: 1rem 0 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1d4ed8; /* crisp blue */
+}
+
+.markdown p {
+  margin: 0.25rem 0 0.75rem;
+  line-height: 1.5;
+}
+
+.markdown ul {
+  margin: 0.25rem 0 1rem;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.markdown li {
+  margin-bottom: 0.3rem;
+}
