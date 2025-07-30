@@ -8,6 +8,7 @@ export default function ExpertSearchComponent() {
   const [experts, setExperts] = useState([]);
   const [selectedExperts, setSelectedExperts] = useState(new Set());
   const [searchStatus, setSearchStatus] = useState('');
+  const [searchCompleted, setSearchCompleted] = useState(false);
 
   // Mock expert data for demonstration - using the JSON format
   const mockExpertsData = {
@@ -89,7 +90,10 @@ export default function ExpertSearchComponent() {
         setSearchStatus('Compiling results...');
         setTimeout(() => {
           const convertedExperts = convertJsonToExperts(mockExpertsData);
-          setExperts(convertedExperts);
+          // Simulate sometimes finding no results (for demo)
+          // setExperts(Math.random() > 0.3 ? convertedExperts : []);
+          setExperts(convertedExperts); // Always show results for now
+          setSearchCompleted(true);
           setIsLoading(false);
           setSearchStatus('');
         }, 800);
@@ -122,14 +126,23 @@ export default function ExpertSearchComponent() {
   };
 
   const getStatusClass = () => {
+    if (isLoading) return 'text-orange-500';
+    if (searchCompleted && experts.length === 0) return 'text-red-500';
+    if (experts.length > 0) return 'text-green-500';
     return 'text-gray-600';
   };
 
   const getStatusDot = () => {
+    if (isLoading) return 'bg-orange-400';
+    if (searchCompleted && experts.length === 0) return 'bg-red-400';
+    if (experts.length > 0) return 'bg-green-400';
     return 'bg-gray-400';
   };
 
   const getStatusText = () => {
+    if (isLoading) return 'Searching...';
+    if (searchCompleted && experts.length === 0) return 'No experts found';
+    if (experts.length > 0) return 'Experts found!';
     return 'Find experts you need';
   };
 
@@ -278,6 +291,21 @@ export default function ExpertSearchComponent() {
                 <div className="flex items-center space-x-3">
                   <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
                   <span className="text-blue-800 font-medium">{searchStatus}</span>
+                </div>
+              </div>
+            )}
+
+            {/* No Results Display */}
+            {searchCompleted && experts.length === 0 && !isLoading && (
+              <div className="mt-6">
+                <div className="text-center p-6 bg-red-50 rounded-lg border border-red-200">
+                  <div className="text-red-600 mb-2">
+                    <Search className="w-12 h-12 mx-auto opacity-50" />
+                  </div>
+                  <h3 className="text-lg font-medium text-red-800 mb-2">No Experts Found</h3>
+                  <p className="text-red-600 text-sm">
+                    We couldn't find any experts matching your search criteria. Try adjusting your search terms or being more general in your request.
+                  </p>
                 </div>
               </div>
             )}
