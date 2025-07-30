@@ -185,7 +185,7 @@ export default function ExpertSearchComponent() {
   );
 
   return (
-    <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
+    <div className="max-w-md mx-auto bg-gray-50">
       {/* Collapsed Header - Always Visible */}
       <div className="w-full max-w-[300px] font-sans">
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm w-full overflow-hidden transition-all duration-200">
