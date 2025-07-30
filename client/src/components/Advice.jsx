@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
-  MessageCircle, ChevronDown, Send, Lightbulb, Loader2,
-} from 'lucide-react';
-import '../styles/Advice.css';
+  MessageCircle,
+  ChevronDown,
+  Send,
+  Lightbulb,
+  Loader2,
+} from "lucide-react";
+import "../styles/Advice.css";
 
 export default function SidebarAdvice() {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [userInput, setUserInput] = useState('');
-  const [subject, setSubject] = useState('');
+  const [userInput, setUserInput] = useState("");
+  const [subject, setSubject] = useState("");
   const [recommendation, setRecommendation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasAdvice, setHasAdvice] = useState(false);
@@ -32,7 +36,7 @@ export default function SidebarAdvice() {
         setIsLoading(false);
       })
       .withFailureHandler((error) => {
-        console.error('Error calling Apps Script:', error);
+        console.error("Error calling Apps Script:", error);
         setRecommendation(null);
         setHasAdvice(true);
         setIsLoading(false);
@@ -41,45 +45,65 @@ export default function SidebarAdvice() {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
     }
   };
 
   const handleClear = () => {
-    setUserInput('');
-    setSubject('');
+    setUserInput("");
+    setSubject("");
     setRecommendation(null);
     setHasAdvice(false);
   };
 
   const getStatusClass = () => {
-    if (isLoading) return 'text-yellow';
-    if (hasAdvice && recommendation?.advice) return 'text-green';
-    if (hasAdvice && !recommendation?.advice) return 'text-red';
-    return 'text-gray';
+    if (isLoading) return "text-yellow";
+    if (hasAdvice && recommendation?.advice) return "text-green";
+    if (hasAdvice && !recommendation?.advice) return "text-red";
+    return "text-gray";
   };
 
   const getStatusDot = () => {
-    if (isLoading) return 'dot-yellow';
-    if (hasAdvice && recommendation?.advice) return 'dot-green';
-    if (hasAdvice && !recommendation?.advice) return 'dot-red';
-    return 'dot-gray';
+    if (isLoading) return "dot-yellow";
+    if (hasAdvice && recommendation?.advice) return "dot-green";
+    if (hasAdvice && !recommendation?.advice) return "dot-red";
+    return "dot-gray";
   };
 
   const getStatusSubtitle = () => {
-    if (isLoading) return 'Finding real-world connections...';
-    if (hasAdvice && recommendation?.advice) return 'Advice ready';
-    if (hasAdvice && !recommendation?.advice) return 'No advice available';
-    return 'Ask for guidance';
+    if (isLoading) return "Finding real-world connections...";
+    if (hasAdvice && recommendation?.advice) return "Advice ready";
+    if (hasAdvice && !recommendation?.advice) return "No advice available";
+    return "Ask for guidance";
   };
 
   const getStatusTextColor = () => {
-    if (isLoading) return '#facc15';
-    if (hasAdvice && recommendation?.advice) return '#22c55e';
-    if (hasAdvice && !recommendation?.advice) return '#ef4444';
-    return '#6b7280';
+    if (isLoading) return "#facc15";
+    if (hasAdvice && recommendation?.advice) return "#22c55e";
+    if (hasAdvice && !recommendation?.advice) return "#ef4444";
+    return "#6b7280";
+  };
+
+  const buildFullText = () => {
+    return [
+      `🧠 Advice: ${recommendation?.advice || ""}`,
+      ``,
+      `📘 Subject: ${recommendation?.subject || ""}`,
+      ``,
+      `🌍 Connection: ${recommendation?.connection || ""}`,
+      ``,
+      `📌 Examples:`,
+      ...(recommendation?.examples?.length
+        ? recommendation.examples.map((ex) => `• ${ex}`)
+        : ["• No examples provided."]),
+      ``,
+      `📚 Resources:`,
+      ...(recommendation?.resources?.length
+        ? recommendation.resources.map((res) => `• ${res.title} - ${res.url}`)
+        : ["• No resources provided."]),
+    ].join("\n");
   };
 
   return (
@@ -94,12 +118,15 @@ export default function SidebarAdvice() {
               </div>
               <div>
                 <div className="title">Get Advice</div>
-                <div className="subtitle" style={{ color: getStatusTextColor() }}>
+                <div
+                  className="subtitle"
+                  style={{ color: getStatusTextColor() }}
+                >
                   {getStatusSubtitle()}
                 </div>
               </div>
             </div>
-            <ChevronDown className={`chevron ${isExpanded ? 'rotate' : ''}`} />
+            <ChevronDown className={`chevron ${isExpanded ? "rotate" : ""}`} />
           </div>
         </div>
 
@@ -142,7 +169,11 @@ export default function SidebarAdvice() {
                     {isLoading ? (
                       <>
                         <Loader2 className="loading-icon animate-spin" />
-                        <span className="typing-dots">Finding real-world connections<span>.</span><span>.</span><span>.</span></span>
+                        <span className="typing-dots">
+                          Finding real-world connections<span>.</span>
+                          <span>.</span>
+                          <span>.</span>
+                        </span>
                       </>
                     ) : (
                       <>
@@ -152,39 +183,65 @@ export default function SidebarAdvice() {
                     )}
                   </button>
                   {!isLoading && (userInput || recommendation || subject) && (
-                    <button onClick={handleClear} className="clear-btn">Clear</button>
+                    <button onClick={handleClear} className="clear-btn">
+                      Clear
+                    </button>
                   )}
                 </div>
               </div>
 
               {/* Display advice content */}
               {hasAdvice && (
-                <div className={`advice-box ${!recommendation?.advice ? 'text-red' : ''}`}>
+                <div
+                  className={`advice-box ${
+                    !recommendation?.advice ? "text-red" : ""
+                  }`}
+                >
                   <div className="advice-content">
                     <Lightbulb className="bulb-icon" />
                     <h4>Advice for you:</h4>
                   </div>
                   <div className="markdown">
-                    {recommendation?.advice && <p><strong>🧠 Advice:</strong> {recommendation.advice}</p>}
-                    {recommendation?.subject && <p><strong>📘 Subject:</strong> {recommendation.subject}</p>}
-                    {recommendation?.connection && <p><strong>🌍 Connection:</strong> {recommendation.connection}</p>}
-
+                    {recommendation?.advice && (
+                      <>
+                        <h5>🧠 Advice</h5>
+                        <p>{recommendation.advice}</p>
+                      </>
+                    )}
+                    {recommendation?.subject && (
+                      <>
+                        <h5>📘 Subject</h5>
+                        <p>{recommendation.subject}</p>
+                      </>
+                    )}
+                    {recommendation?.connection && (
+                      <>
+                        <h5>🌍 Connection</h5>
+                        <p>{recommendation.connection}</p>
+                      </>
+                    )}
                     {recommendation?.examples?.length > 0 && (
                       <>
-                        <h5>📌 Examples:</h5>
+                        <h5>📌 Examples</h5>
                         <ul>
-                          {recommendation.examples.map((ex, idx) => <li key={idx}>{ex}</li>)}
+                          {recommendation.examples.map((ex, idx) => (
+                            <li key={idx}>{ex}</li>
+                          ))}
                         </ul>
                       </>
                     )}
-
                     {recommendation?.resources?.length > 0 && (
                       <>
-                        <h5>📚 Resources:</h5>
+                        <h5>📚 Resources</h5>
                         <ul>
                           {recommendation.resources.map((res, idx) => (
                             <li key={idx}>
-                              <a href={res.url} target="_blank" rel="noopener noreferrer">
+                              <a
+                                href={res.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: "#2563eb", textDecoration: "underline" }}
+                              >
                                 {res.title}
                               </a>
                               <br />
@@ -201,11 +258,25 @@ export default function SidebarAdvice() {
               {/* Buttons if advice exists */}
               {recommendation?.advice && (
                 <div className="copy-section">
-                  <button onClick={() => navigator.clipboard.writeText(recommendation.advice)}>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(buildFullText())}
+                  >
                     📋 Copy advice to clipboard
                   </button>
-                  <button className="add-btn" onClick={() => alert("✅ Added to your project!")}>➕ Add to Project</button>
-                  <button className="pdf-btn" onClick={() => alert("📄 PDF download is not available yet")}>📄 Download as PDF</button>
+                  <button
+                    className="add-btn"
+                    onClick={() => alert("✅ Added to your project!")}
+                  >
+                    ➕ Add to Project
+                  </button>
+                  <button
+                    className="pdf-btn"
+                    onClick={() =>
+                      alert("📄 PDF download is not available yet")
+                    }
+                  >
+                    📄 Download as PDF
+                  </button>
                 </div>
               )}
 
