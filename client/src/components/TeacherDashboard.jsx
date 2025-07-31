@@ -4,9 +4,9 @@ import StudentProjects from './StudentProjects';
 export default function TeacherDashboard({ email }) {
   const studentsData = [
     {
-      "student": "jason@gmail.com",
-      "FirstName": "Jason",
-      "Lastname": "Zimmer",
+      "student": "john@gmail.com",
+      "FirstName": "John",
+      "Lastname": "Doe",
       "Project": {
         "project_title": "Statistical Analysis of Mean, Median, Mode",
         "description": "Developing an interactive web application to explain and visualize the concepts of mean, median, and mode in mathematics.",
@@ -126,9 +126,9 @@ export default function TeacherDashboard({ email }) {
       }
     },
     {
-      "student": "jake@gmail.com",
-      "FirstName": "Jake",
-      "Lastname": "Synder",
+      "student": "jane@gmail.com",
+      "FirstName": "Jane",
+      "Lastname": "Hoper",
       "Project": {
         "project_title": "Photosynthesis Explained",
         "description": "An educational project aimed at explaining the process of photosynthesis in plants",

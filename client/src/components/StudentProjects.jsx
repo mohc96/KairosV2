@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import {
-  Users, ChevronDown, Eye, Check, AlertCircle, User, FileText, Loader2, ChevronRight
-} from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
+import StudentProjectCard from './StudentProjectCard';
 
 export default function StudentProjects(props) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -106,16 +105,6 @@ export default function StudentProjects(props) {
     }
   };
 
-  const getStudentStatusClass = (studentId) => {
-    if (exportingStudent === studentId) return 'text-blue-600';
-    return 'text-gray-600';
-  };
-
-  const getStudentStatusDot = (studentId) => {
-    if (exportingStudent === studentId) return 'bg-blue-500';
-    return 'bg-gray-400';
-  };
-
   const getOverallStatusText = () => {
     if (exportingStudent) return 'Exporting project...';
     return `${studentsData.length} student projects ready`;
@@ -131,14 +120,6 @@ export default function StudentProjects(props) {
     return 'bg-gray-400';
   };
 
-  const ProjectPreview = ({ project }) => (
-    <div className="bg-white border border-gray-100 rounded p-2">
-      <div className="text-sm font-semibold text-gray-900 mb-1">{project.project_title}</div>
-      <div className="text-xs text-gray-600 mb-2">{project.description}</div>
-      <div className="text-xs text-blue-600 font-medium">Subject: {project.subject_domain}</div>
-    </div>
-  );
-
   return (
     <div className="w-full max-w-[400px] font-sans">
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm w-full overflow-hidden transition-all duration-200">
@@ -149,10 +130,6 @@ export default function StudentProjects(props) {
         >
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <Users className={`w-5 h-5 ${getOverallStatusClass()}`} />
-                <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${getOverallStatusDot()}`}></div>
-              </div>
               <div>
                 <div className="font-medium text-gray-900">Student Projects</div>
                 <div className="text-sm text-gray-500">
@@ -178,58 +155,15 @@ export default function StudentProjects(props) {
 
               {/* Students List */}
               <div className="space-y-3">
-                {studentsData.map((student, index) => {
-                  const studentId = student.student;
-                  const isExporting = exportingStudent === studentId;
-                  
-                  return (
-                    <div key={studentId} className="border border-gray-200 rounded-lg overflow-hidden">
-                      {/* Student Header */}
-                      <div className="p-1 bg-gray-50">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="relative">
-                              <User className={`w-4 h-4 ${getStudentStatusClass(studentId)}`} />
-                              <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${getStudentStatusDot(studentId)}`}></div>
-                            </div>
-                            <div>
-                              <div className="font-medium text-gray-900 text-sm">
-                                {student.FirstName} {student.Lastname}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {student.student}
-                              </div>
-                              <div className="text-xs text-blue-600 font-medium">
-                                {student.Project.subject_domain}
-                              </div>
-                            </div>
-                          </div>
-
-                          <button
-                            onClick={() => handleViewProject(student, index)}
-                            disabled={isExporting}
-                            className="flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded text-xs font-medium transition-colors hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                          >
-                            {isExporting ? (
-                              <>
-                                <Loader2 className="w-3 h-3 animate-spin" />
-                                <span>Exporting...</span>
-                              </>
-                            ) : (
-                              <>
-                                <FileText className="w-3 h-3" />
-                                <span>Export Project</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Project Preview */}
-                      <ProjectPreview project={student.Project} />
-                    </div>
-                  );
-                })}
+                {studentsData.map((student, index) => (
+                  <StudentProjectCard 
+                    key={student.student}
+                    student={student}
+                    index={index}
+                    exportingStudent={exportingStudent}
+                    onViewProject={handleViewProject}
+                  />
+                ))}
               </div>
 
               {/* Overall Status */}
@@ -240,15 +174,6 @@ export default function StudentProjects(props) {
               </div>
 
               {/* Instructions */}
-              <div className="mt-3 bg-blue-50 border border-blue-200 p-2 rounded-lg">
-                <h5 className="text-xs font-medium text-blue-900 mb-1">Instructions:</h5>
-                <ul className="text-xs text-blue-800 space-y-1">
-                  <li>• Click "Export Project" for any student</li>
-                  <li>• A new section will be added to the document</li>
-                  <li>• The project will be formatted with stages and tasks</li>
-                  <li>• The document will automatically scroll to the new content</li>
-                </ul>
-              </div>
             </div>
           </div>
         )}
