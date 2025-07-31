@@ -129,3 +129,32 @@ function getStudentProjectsForTeacher() {
     },
   ];
 }
+
+function findExperts(message) {
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
+  const payload = {
+    action: "helpme",
+    payload: {
+      message: message,
+      geolocation: "Tucson, AZ", // You can make this dynamic
+      email_id: "student2@gmail.com" // Gets the current user's email
+    }
+  };
+  
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+  
+  try {
+    const response = UrlFetchApp.fetch(baseUrl, options);
+    const result = JSON.parse(response.getContentText());
+    Logger.log(result);
+    return result;
+  } catch (error) {
+    Logger.log('Error finding experts: ' + error.toString());
+    throw error;
+  }
+}

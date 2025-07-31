@@ -82,23 +82,53 @@ export default function ExpertSearchComponent() {
     
     setIsLoading(true);
     setSearchStatus('Searching for experts...');
+    setSearchCompleted(false);
+    setExperts([]);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
       setSearchStatus('Analyzing expertise...');
-      setTimeout(() => {
-        setSearchStatus('Compiling results...');
-        setTimeout(() => {
-          const convertedExperts = convertJsonToExperts(mockExpertsData);
-          // Simulate sometimes finding no results (for demo)
-          // setExperts(Math.random() > 0.3 ? convertedExperts : []);
-          setExperts(convertedExperts); // Always show results for now
-          setSearchCompleted(true);
-          setIsLoading(false);
-          setSearchStatus('');
-        }, 800);
-      }, 1000);
-    }, 1200);
+      
+      // Call Google Apps Script function instead of direct fetch
+      const result = await new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject)
+          .findExperts(topic.trim());
+      });
+
+      setSearchStatus('Compiling results...');
+      
+      // Process the response
+      let expertsList = [];
+      if (result && result.json && Array.isArray(result.json)) {
+        expertsList = convertJsonToExperts(result);
+      } else if (result && Array.isArray(result)) {
+        expertsList = result.map((expert, index) => ({
+          id: index + 1,
+          name: expert.full_name || expert.name || 'Unknown',
+          organization: expert.organization || 'Unknown Organization',
+          bio: expert.bio || 'No bio available',
+          email: expert.email || 'No email provided',
+          skills: expert.skills || [],
+          tags: expert.tags || []
+        }));
+      }
+
+      setExperts(expertsList);
+      setSearchCompleted(true);
+      setIsLoading(false);
+      setSearchStatus('');
+
+    } catch (error) {
+      console.error('Error searching for experts:', error);
+      setSearchStatus('');
+      setIsLoading(false);
+      setSearchCompleted(true);
+      setExperts([]);
+      
+      // Show error message to user
+      alert('Sorry, there was an error searching for experts. Please try again.');
+    }
   };
 
   const toggleExpertSelection = (expertId) => {
