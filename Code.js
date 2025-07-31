@@ -37,7 +37,7 @@ function onOpen() {
     }
   }
   function callOpenAI(prompt) {
-  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'; // Lambda URL
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
 
   const payload = {
     action: "advice",
@@ -54,11 +54,28 @@ function onOpen() {
     muteHttpExceptions: true
   };
 
-  const response = UrlFetchApp.fetch(baseUrl, options);
-  const result = JSON.parse(response.getContentText());
-  Logger.log(result)
+  try {
+    const response = UrlFetchApp.fetch(baseUrl, options);
+    const result = JSON.parse(response.getContentText());
 
-  return result.recommendation || "No response available";
+    Logger.log("🔁 Full advice response:");
+    Logger.log(result);
+
+    // ✅ Return the entire object — not just result.recommendation.advice
+    return result;
+  } catch (error) {
+    Logger.log("❌ Error fetching from OpenAI Lambda:");
+    Logger.log(error);
+    return {
+      recommendation: {
+        advice: "No response available",
+        subject: "",
+        connection: "",
+        examples: [],
+        resources: []
+      }
+    };
+  }
 }
 
 function generateProject(prompt) {
@@ -85,31 +102,51 @@ function generateProject(prompt) {
   return JSON.stringify(result.json.project) || "No response available";
 }
 
-
-
-function processDailyCheckin(payload) {
-
-
+function processDailyCheckin(userInput) {
   console.log("this is from processDailyCheckin");
+  const url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
   
-  const url = 'YOUR_API_ENDPOINT/process-daily-checkin';
- 
+  const payload = {
+    action: "morningpulse",
+    payload: {
+      email_id: Session.getActiveUser().getEmail(),
+      emoji: userInput.emoji,
+      route: "daily-checkin",
+      message: userInput.message
+    }
+  };
   const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    payload: JSON.stringify(payload)
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
   };
   
   try {
     const response = UrlFetchApp.fetch(url, options);
-    return JSON.parse(response.getContentText());
-  } catch (error) {
-    console.error('Error processing daily check-in:', error);
-    throw error;
-  }
 
+    console.log('API Response Status:', response.getResponseCode());
+    
+    const result = JSON.parse(response.getContentText());
+    console.log('API Response:', result);
+    if( result.statusCode == 200)
+      console.log("status 200 received")
+    
+    // Return the project data or fallback message
+    return JSON.parse(JSON.stringify(result?.motivation)) || "No response available";
+  } catch (error) {
+    console.error('Error processing daily check-in:', error.toString());
+    
+    // Return a fallback response instead of throwing
+    const fallbackResponses = [
+      "Thank you for your daily check-in! Keep up the great work! 🌟",
+      "Great job starting your day with intention! 🌟",
+      "Your mindful check-in sets a positive tone for the day ahead! ✨",
+      "Thank you for taking a moment to reflect. Keep up the amazing work! 💪"
+    ];
+    
+    return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+  }
 }
 
 function getStudentProjectsForTeacher() {
@@ -128,4 +165,58 @@ function getStudentProjectsForTeacher() {
       docLink: 'https://docs.google.com/document/d/yyyyyyy',
     },
   ];
+}
+
+function findExperts(message) {
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
+  const payload = {
+    action: "helpme",
+    payload: {
+      message: message,
+      geolocation: "Tucson, AZ", // You can make this dynamic
+      email_id: "student2@gmail.com" // Gets the current user's email
+    }
+  };
+  
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+  
+  try {
+    const response = UrlFetchApp.fetch(baseUrl, options);
+    const result = JSON.parse(response.getContentText());
+    Logger.log(result);
+    return result;
+  } catch (error) {
+    Logger.log('Error finding experts: ' + error.toString());
+    throw error;
+  }
+}
+
+function submitFormToScript(payload){
+  Logger.log(payload)
+}
+
+function callMorningPulseAPI(payload) {
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
+
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  try {
+    const response = UrlFetchApp.fetch(baseUrl, options);
+    const result = JSON.parse(response.getContentText());
+    Logger.log('Morning pulse API response:', result);
+    return result;
+  } catch (error) {
+    console.error('Error calling morning pulse API:', error);
+    throw error;
+  }
 }
