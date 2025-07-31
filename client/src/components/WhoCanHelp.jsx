@@ -8,6 +8,8 @@ export default function ExpertSearchComponent() {
   const [experts, setExperts] = useState([]);
   const [selectedExperts, setSelectedExperts] = useState(new Set());
   const [searchStatus, setSearchStatus] = useState('');
+  const [searchCompleted, setSearchCompleted] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   // Mock expert data for demonstration - using the JSON format
   const mockExpertsData = {
@@ -81,20 +83,53 @@ export default function ExpertSearchComponent() {
     
     setIsLoading(true);
     setSearchStatus('Searching for experts...');
+    setSearchCompleted(false);
+    setExperts([]);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
       setSearchStatus('Analyzing expertise...');
-      setTimeout(() => {
-        setSearchStatus('Compiling results...');
-        setTimeout(() => {
-          const convertedExperts = convertJsonToExperts(mockExpertsData);
-          setExperts(convertedExperts);
-          setIsLoading(false);
-          setSearchStatus('');
-        }, 800);
-      }, 1000);
-    }, 1200);
+      
+      // Call Google Apps Script function instead of direct fetch
+      const result = await new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject)
+          .findExperts(topic.trim());
+      });
+
+      setSearchStatus('Compiling results...');
+      
+      // Process the response
+      let expertsList = [];
+      if (result && result.json && Array.isArray(result.json)) {
+        expertsList = convertJsonToExperts(result);
+      } else if (result && Array.isArray(result)) {
+        expertsList = result.map((expert, index) => ({
+          id: index + 1,
+          name: expert.full_name || expert.name || 'Unknown',
+          organization: expert.organization || 'Unknown Organization',
+          bio: expert.bio || 'No bio available',
+          email: expert.email || 'No email provided',
+          skills: expert.skills || [],
+          tags: expert.tags || []
+        }));
+      }
+
+      setExperts(expertsList);
+      setSearchCompleted(true);
+      setIsLoading(false);
+      setSearchStatus('');
+
+    } catch (error) {
+      console.error('Error searching for experts:', error);
+      setSearchStatus('');
+      setIsLoading(false);
+      setSearchCompleted(true);
+      setExperts([]);
+      
+      // Show error message to user
+      alert('Sorry, there was an error searching for experts. Please try again.');
+    }
   };
 
   const toggleExpertSelection = (expertId) => {
@@ -122,14 +157,23 @@ export default function ExpertSearchComponent() {
   };
 
   const getStatusClass = () => {
+    if (isLoading) return 'text-orange-500';
+    if (searchCompleted && experts.length === 0) return 'text-red-500';
+    if (experts.length > 0) return 'text-green-500';
     return 'text-gray-600';
   };
 
   const getStatusDot = () => {
+    if (isLoading) return 'bg-orange-400';
+    if (searchCompleted && experts.length === 0) return 'bg-red-400';
+    if (experts.length > 0) return 'bg-green-400';
     return 'bg-gray-400';
   };
 
   const getStatusText = () => {
+    if (isLoading) return 'Searching...';
+    if (searchCompleted && experts.length === 0) return 'No experts found';
+    if (experts.length > 0) return 'Experts found!';
     return 'Find experts you need';
   };
 
@@ -282,6 +326,21 @@ export default function ExpertSearchComponent() {
               </div>
             )}
 
+            {/* No Results Display */}
+            {searchCompleted && experts.length === 0 && !isLoading && (
+              <div className="mt-6">
+                <div className="text-center p-6 bg-red-50 rounded-lg border border-red-200">
+                  <div className="text-red-600 mb-2">
+                    <Search className="w-12 h-12 mx-auto opacity-50" />
+                  </div>
+                  <h3 className="text-lg font-medium text-red-800 mb-2">No Experts Found</h3>
+                  <p className="text-red-600 text-sm">
+                    We couldn't find any experts matching your search criteria. Try adjusting your search terms or being more general in your request.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Results Display */}
             {experts.length > 0 && !isLoading && (
               <div className="mt-6">
@@ -315,13 +374,30 @@ export default function ExpertSearchComponent() {
                       const expertsText = selectedExpertsList.map(expert => 
                         `${expert.name} - ${expert.organization}\nEmail: ${expert.email}\nBio: ${expert.bio}\nSkills: ${expert.skills.join(', ')}\nTags: ${expert.tags.join(', ')}`
                       ).join('\n\n');
-                      navigator.clipboard.writeText(expertsText);
-                      alert('Expert information copied to clipboard!');
+                      
+                      navigator.clipboard.writeText(expertsText).then(() => {
+                        setCopySuccess(true);
+                        setTimeout(() => setCopySuccess(false), 2000);
+                      }).catch(() => {
+                        // Fallback for older browsers or when clipboard API fails
+                        const textArea = document.createElement('textarea');
+                        textArea.value = expertsText;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        setCopySuccess(true);
+                        setTimeout(() => setCopySuccess(false), 2000);
+                      });
                     }}
-                    className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200"
+                    className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200 ${
+                      copySuccess 
+                        ? 'bg-green-50 text-green-700 border-green-200' 
+                        : 'bg-white hover:bg-gray-50 text-gray-700'
+                    }`}
                   >
-                    <span>📋</span>
-                    <span>Copy to clipboard</span>
+                    <span>{copySuccess ? '✅' : '📋'}</span>
+                    <span>{copySuccess ? 'Copied!' : 'Copy to clipboard'}</span>
                   </button>
 
                   <button
