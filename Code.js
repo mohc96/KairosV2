@@ -86,25 +86,35 @@ function generateProject(prompt) {
 }
 
 
-
 function processDailyCheckin(payload) {
 
 
   console.log("this is from processDailyCheckin");
   
-  const url = 'YOUR_API_ENDPOINT/process-daily-checkin';
+  const url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/process-daily-checkin';
  
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    payload: JSON.stringify(payload)
-  };
+  // const options = {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   payload: JSON.stringify(payload)
+  // };
   
   try {
-    const response = UrlFetchApp.fetch(url, options);
-    return JSON.parse(response.getContentText());
+    const response = UrlFetchApp.fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.statusText}`);
+    }
+    const result = JSON.parse(response.getContentText());
+    return JSON.stringify(result.json.project) || "No response available";
   } catch (error) {
     console.error('Error processing daily check-in:', error);
     throw error;
