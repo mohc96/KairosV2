@@ -117,7 +117,7 @@ export default function CreateProject() {
     } catch (error) {
       console.error('Error calling generateProject:', error);
       setProjectOutput("I'm currently unable to connect to the project service. Please try again later.");
-      setHasProject(true);
+      setHasProject(false);
     } finally {
       setIsLoading(false);
     }
@@ -238,17 +238,17 @@ export default function CreateProject() {
 
   const getStatusClass = () => {
     if (isLocked) return 'text-red-600';
-    if (isEdited) return 'text-yellow-600';
+    if (isEdited) return 'text-orange-600';
     if (hasProject) return 'text-green-600';
-    if (isLoading) return 'text-blue-600';
+    if (isLoading) return 'text-yellow-600';
     return 'text-gray-600';
   };
 
   const getStatusDot = () => {
     if (isLocked) return 'bg-red-500';
-    if (isEdited) return 'bg-yellow-500';
+    if (isEdited) return 'bg-orange-500';
     if (hasProject) return 'bg-green-500';
-    if (isLoading) return 'bg-blue-500';
+    if (isLoading) return 'bg-yellow-500';
     return 'bg-gray-400';
   };
 
@@ -590,20 +590,6 @@ export default function CreateProject() {
                 </div>
               )}
 
-              {/* Status */}
-              <div className={`text-center py-1 px-2 rounded-full text-xs font-medium inline-block mt-2 ${
-                isLocked ? 'bg-red-100 text-red-800' :
-                isEdited ? 'bg-yellow-100 text-yellow-800' :
-                hasProject ? 'bg-green-100 text-green-800' : 
-                isLoading ? 'bg-blue-100 text-blue-800' : 
-                'bg-gray-100 text-gray-700'
-              }`}>
-                {isLocked ? '🔒 Locked' :
-                 isEdited ? '✏️ Modified' :
-                 isLoading ? '🔄 Creating...' : 
-                 hasProject ? '✅ Created' : 
-                 '💡 Ready'}
-              </div>
 
               {/* Tips */}
               {!projectOutput && !isLoading && (
@@ -717,7 +703,7 @@ export default function CreateProject() {
 
               <div className="bg-blue-50 border border-blue-200 p-2 rounded-lg">
                 <p className="text-xs text-blue-800">
-                  <strong>Example:</strong> "Task management app for students" or "Portfolio website with React"
+                  <strong>Example:</strong> "Website to explain Newton's Laws with animations" or "Quiz to test knowledge about U.S. presidents"
                 </p>
               </div>
             </div>
