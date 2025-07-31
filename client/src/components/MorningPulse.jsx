@@ -1,37 +1,9 @@
-<<<<<<< HEAD
 import React from 'react';
 import { Sunrise, CheckCircle } from 'lucide-react';
 import { CollapsibleHeader } from './ui/CollapsibleHeader';
 import { MorningPulseForm } from './forms/MorningPulseForm';
 import { DashboardView } from './dashboard/DashboardView';
 import { useMorningPulseState } from '../hooks/useMorningPulseState';
-=======
-import React, { useState, useEffect } from 'react';
-import { ChevronDown, Send, Loader2, Sunrise, Sparkles, X } from 'lucide-react';
-
-export default function SidebarMorningPulse() {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [selectedEmoji, setSelectedEmoji] = useState('');
-  const [textInput, setTextInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
-  const [motivationResponse, setMotivationResponse] = useState(null);
-
-  // Energy-based emojis from 1 (low energy) to 5 (high energy)
-  const emojis = [
-    { emoji: '😔', level: 1, label: 'Low Energy' },
-    { emoji: '😌', level: 2, label: 'Calm' },
-    { emoji: '😁', level: 3, label: 'Good' },
-    { emoji: '😎', level: 4, label: 'Strong' },
-    { emoji: '🤩', level: 5, label: 'High Energy' }
-  ];
-  const Tooltip = ({ text }) => (
-  <div className="-top-full mb-1 px-2 py-1 text-xs text-white bg-gray-800 rounded shadow-sm z-1 whitespace-nowrap">
-    {text}
-  </div>
-);
->>>>>>> staging
 
 
 // Motivation array
