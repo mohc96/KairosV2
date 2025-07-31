@@ -11,7 +11,7 @@ export const EmojiSelector = ({
   className = "mb-6"
 }) => (
   <div className={className}>
-    <h4 className="text-center text-sm font-medium text-gray-700 mb-4">
+    <h4 className="text-center text-sm font-medium text-gray-700 mb-8">
       {title}
     </h4>
     <div className="flex justify-between items-center px-1 mb-3">

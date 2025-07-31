@@ -6,6 +6,8 @@ export const useMorningPulseState = (initialState = {}) => {
   const [textInput, setTextInput] = useState(initialState.textInput || '');
   const [isLoadingPulse, setIsLoadingPulse] = useState(initialState.isLoadingPulse || false);
   const [currentStep, setCurrentStep] = useState(initialState.currentStep || 'pulse');
+  const [responseMessage, setResponseMessage] = useState(initialState.responseMessage || '');
+
 
   const resetForm = () => {
     setSelectedEmoji('');
@@ -31,6 +33,8 @@ export const useMorningPulseState = (initialState = {}) => {
     currentStep,
     setCurrentStep,
     resetForm,
-    resetAll
+    resetAll,
+    responseMessage,
+    setResponseMessage
   };
 };

@@ -5,6 +5,16 @@ import { MorningPulseForm } from './forms/MorningPulseForm';
 import { DashboardView } from './dashboard/DashboardView';
 import { useMorningPulseState } from '../hooks/useMorningPulseState';
 
+
+// Motivation array
+const MOTIVATIONS = [
+  "Unleash your full potential like a superhero, and tackle today's challenges with electrifying energy! You've got the power to conquer any obstacle that comes your way. Go shine bright!",
+  "Push a little harder today for a better tomorrow.",
+  "You're stronger than you think.",
+  "Keep going, success is around the corner!"
+];
+
+
 // Default data constants
 const DEFAULT_EMOJIS = [
   { emoji: '😔', level: 1, label: 'Low Energy' },
@@ -86,10 +96,12 @@ export default function SidebarMorningPulse({
     isLoadingPulse,
     setIsLoadingPulse,
     currentStep,
+    setResponseMessage,
     setCurrentStep,
     resetForm
   } = state;
 
+  const [motivation, setMotivation] = React.useState("");  
   // Auto-expand functionality
   React.useEffect(() => {
     if (autoExpand && !isExpanded) {
@@ -104,33 +116,60 @@ export default function SidebarMorningPulse({
 
     setIsLoadingPulse(true);
 
+    // const payload = {
+    //   student_id: userEmail,
+    //   emoji: selectedEmoji,
+    //   text_input: textInput.trim(),
+    //   timestamp: new Date().toISOString()
+    // };
+
     const payload = {
-      student_id: userEmail,
-      emoji: selectedEmoji,
-      text_input: textInput.trim(),
-      timestamp: new Date().toISOString()
+      action: "morningpulse",
+      payload: {
+        email_id: userEmail,
+        emoji: selectedEmoji,
+        route: "daily-checkin",
+        message: textInput.trim()
+      }
     };
 
     try {
-      if (onSubmitPulse) {
-        await onSubmitPulse(payload);
-      } else {
-        // Default simulation
-        console.log('Submitting Morning Pulse:', payload);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        console.log('Morning Pulse submitted successfully');
-      }
+      // if (onSubmitPulse) {
+      //   await onSubmitPulse(payload);
+      // } else {
+      //   // Default simulation
+      //   console.log('Submitting Morning Pulse:', payload);
+      //   await new Promise(resolve => setTimeout(resolve, 1000));
+      //   console.log('Morning Pulse submitted successfully');
+      // }
+      // // Pick random motivation
+      // const randomMotivation = MOTIVATIONS[Math.floor(Math.random() * MOTIVATIONS.length)];
+      // setMotivation(randomMotivation);
       
+      // setIsLoadingPulse(false);
+      // setCurrentStep('dashboard');
+      let motivationText = '';
+      if (onSubmitPulse) {
+        onSubmitPulse(payload);
+      } else {
+        // Call processDailyCheckin instead of hardcoded motivation
+        motivationText =  processDailyCheckin(payload);
+      }
+
+      setMotivation(motivationText || "Stay motivated and keep going!");
+
       setIsLoadingPulse(false);
       setCurrentStep('dashboard');
     } catch (error) {
       console.error('Error submitting Morning Pulse:', error);
+      alert("Something went wrong. Check console.");
       setIsLoadingPulse(false);
     }
   };
 
   const handleReset = () => {
     resetForm();
+    setMotivation("");
   };
 
   const getStatusIcon = () => {
@@ -202,6 +241,12 @@ const StatusIconWithDot = () => (
           )}
 
           {currentStep === 'dashboard' && (
+            <>
+            {motivation && (
+                <div className="mb-4 p-3 bg-emerald-100 text-emerald-800 rounded-lg text-center font-semibold">
+                  {motivation}
+                </div>
+              )}
             <DashboardView
               dashboardData={dashboardData}
               onReset={showResetButton ? handleReset : null}
@@ -210,7 +255,10 @@ const StatusIconWithDot = () => (
               resetButtonText={resetButtonText}
               sectionsConfig={sectionsConfig}
               showResetButton={showResetButton}
+              responseMessage={state.responseMessage}
             />
+            </>
+
           )}
         </div>
       )}

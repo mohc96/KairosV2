@@ -4,6 +4,7 @@ import { DashboardSection } from './DashboardSection';
 export const DashboardView = ({ 
   dashboardData,
   onReset,
+  responseMessage = '',
   welcomeTitle = "Welcome to Your Day!",
   welcomeSubtitle = "Here's what's happening in your learning community",
   resetButtonText = "Submit New Morning Pulse",
@@ -61,6 +62,9 @@ export const DashboardView = ({
         <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
         <h3 className="text-lg font-semibold text-gray-900 mb-1">{welcomeTitle}</h3>
         <p className="text-sm text-gray-600">{welcomeSubtitle}</p>
+        {responseMessage && (
+        <p className="text-sm text-emerald-600 font-medium mt-2">{responseMessage}</p>
+        )}
       </div>
 
       <div className="space-y-4 max-h-96 overflow-y-auto">
