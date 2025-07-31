@@ -111,61 +111,35 @@ export default function SidebarMorningPulse({
 
   const toggleExpanded = () => setIsExpanded(!isExpanded);
 
-  const handlePulseSubmit = async () => {
-    if (enableValidation && (!selectedEmoji || !textInput.trim())) return;
+const handlePulseSubmit = () => {
+  // Validation check
+  if (enableValidation && (!selectedEmoji || !textInput.trim())) {
+    return;
+  }
 
-    setIsLoadingPulse(true);
+  setIsLoadingPulse(true);
 
-    // const payload = {
-    //   student_id: userEmail,
-    //   emoji: selectedEmoji,
-    //   text_input: textInput.trim(),
-    //   timestamp: new Date().toISOString()
-    // };
-
-    const payload = {
-      action: "morningpulse",
-      payload: {
-        email_id: userEmail,
-        emoji: selectedEmoji,
-        route: "daily-checkin",
-        message: textInput.trim()
-      }
-    };
-
-    try {
-      // if (onSubmitPulse) {
-      //   await onSubmitPulse(payload);
-      // } else {
-      //   // Default simulation
-      //   console.log('Submitting Morning Pulse:', payload);
-      //   await new Promise(resolve => setTimeout(resolve, 1000));
-      //   console.log('Morning Pulse submitted successfully');
-      // }
-      // // Pick random motivation
-      // const randomMotivation = MOTIVATIONS[Math.floor(Math.random() * MOTIVATIONS.length)];
-      // setMotivation(randomMotivation);
-      
-      // setIsLoadingPulse(false);
-      // setCurrentStep('dashboard');
-      let motivationText = '';
-      if (onSubmitPulse) {
-        onSubmitPulse(payload);
-      } else {
-        // Call processDailyCheckin instead of hardcoded motivation
-        motivationText =  processDailyCheckin(payload);
-      }
-
-      setMotivation(motivationText || "Stay motivated and keep going!");
-
-      setIsLoadingPulse(false);
-      setCurrentStep('dashboard');
-    } catch (error) {
-      console.error('Error submitting Morning Pulse:', error);
-      alert("Something went wrong. Check console.");
-      setIsLoadingPulse(false);
-    }
+  const userInput = {
+    emoji: selectedEmoji,
+    message: textInput.trim()
   };
+ 
+      google.script.run
+        .withSuccessHandler((motivationText) => {
+          // Set the motivation message
+          setMotivation(motivationText || "Stay motivated and keep going!");
+          
+          // Update state to show dashboard
+          setIsLoadingPulse(false);
+          setCurrentStep('dashboard');
+        })
+        .withFailureHandler((error) => {
+          console.error('Error submitting Morning Pulse:', error);
+          alert("Something went wrong. Check console.");
+          setIsLoadingPulse(false);
+        })
+        .processDailyCheckin(userInput);
+};
 
   const handleReset = () => {
     resetForm();
