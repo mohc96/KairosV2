@@ -9,6 +9,7 @@ export default function ExpertSearchComponent() {
   const [selectedExperts, setSelectedExperts] = useState(new Set());
   const [searchStatus, setSearchStatus] = useState('');
   const [searchCompleted, setSearchCompleted] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   // Mock expert data for demonstration - using the JSON format
   const mockExpertsData = {
@@ -373,13 +374,30 @@ export default function ExpertSearchComponent() {
                       const expertsText = selectedExpertsList.map(expert => 
                         `${expert.name} - ${expert.organization}\nEmail: ${expert.email}\nBio: ${expert.bio}\nSkills: ${expert.skills.join(', ')}\nTags: ${expert.tags.join(', ')}`
                       ).join('\n\n');
-                      navigator.clipboard.writeText(expertsText);
-                      alert('Expert information copied to clipboard!');
+                      
+                      navigator.clipboard.writeText(expertsText).then(() => {
+                        setCopySuccess(true);
+                        setTimeout(() => setCopySuccess(false), 2000);
+                      }).catch(() => {
+                        // Fallback for older browsers or when clipboard API fails
+                        const textArea = document.createElement('textarea');
+                        textArea.value = expertsText;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        setCopySuccess(true);
+                        setTimeout(() => setCopySuccess(false), 2000);
+                      });
                     }}
-                    className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200"
+                    className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200 ${
+                      copySuccess 
+                        ? 'bg-green-50 text-green-700 border-green-200' 
+                        : 'bg-white hover:bg-gray-50 text-gray-700'
+                    }`}
                   >
-                    <span>📋</span>
-                    <span>Copy to clipboard</span>
+                    <span>{copySuccess ? '✅' : '📋'}</span>
+                    <span>{copySuccess ? 'Copied!' : 'Copy to clipboard'}</span>
                   </button>
 
                   <button
