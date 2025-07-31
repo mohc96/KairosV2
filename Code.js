@@ -102,31 +102,51 @@ function generateProject(prompt) {
   return JSON.stringify(result.json.project) || "No response available";
 }
 
-
-
-function processDailyCheckin(payload) {
-
-
+function processDailyCheckin(userInput) {
   console.log("this is from processDailyCheckin");
+  const url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
   
-  const url = 'YOUR_API_ENDPOINT/process-daily-checkin';
- 
+  const payload = {
+    action: "morningpulse",
+    payload: {
+      email_id: Session.getActiveUser().getEmail(),
+      emoji: userInput.emoji,
+      route: "daily-checkin",
+      message: userInput.message
+    }
+  };
   const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    payload: JSON.stringify(payload)
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
   };
   
   try {
     const response = UrlFetchApp.fetch(url, options);
-    return JSON.parse(response.getContentText());
-  } catch (error) {
-    console.error('Error processing daily check-in:', error);
-    throw error;
-  }
 
+    console.log('API Response Status:', response.getResponseCode());
+    
+    const result = JSON.parse(response.getContentText());
+    console.log('API Response:', result);
+    if( result.statusCode == 200)
+      console.log("status 200 received")
+    
+    // Return the project data or fallback message
+    return JSON.parse(JSON.stringify(result?.motivation)) || "No response available";
+  } catch (error) {
+    console.error('Error processing daily check-in:', error.toString());
+    
+    // Return a fallback response instead of throwing
+    const fallbackResponses = [
+      "Thank you for your daily check-in! Keep up the great work! 🌟",
+      "Great job starting your day with intention! 🌟",
+      "Your mindful check-in sets a positive tone for the day ahead! ✨",
+      "Thank you for taking a moment to reflect. Keep up the amazing work! 💪"
+    ];
+    
+    return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+  }
 }
 
 function submitFormToScript(payload){
