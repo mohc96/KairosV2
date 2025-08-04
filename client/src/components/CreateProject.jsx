@@ -415,7 +415,7 @@ export default function CreateProject() {
             <div className="flex items-center gap-3">
               <div className="relative">
                 <FolderPlus className={`w-5 h-5 ${getStatusClass()}`} />
-                <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${getStatusDot()}`}></div>
+                <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${getStatusDot()}`}></div>
               </div>
               <div>
                 <div className="font-medium text-gray-900">Create Project</div>

@@ -18,8 +18,6 @@ export default function StudentDashboard({ email }) {
       <ExpertSearchComponent />
       <AboutMe />
       <SidebarBreakTimer />
-      
-      
     </div>
   );
 }
