@@ -25,10 +25,8 @@ const DEFAULT_EMOJIS = [
 ];
 
 const DEFAULT_DASHBOARD_DATA = {
-  "ActiveProjects": [
-    "Climate Change in Arcadia, AZ",
-    "Displacement of People Impacted by Climate Disasters",
-    "Urban Heat Islands"
+  "ValueMessage": [
+    
   ],
   "Peers": [
     "Diego Lopez completed a major project assessment!",
@@ -38,9 +36,11 @@ const DEFAULT_DASHBOARD_DATA = {
     "Sofia Martinez is looking to put together a reading group.",
     "Jin Yamamoto is new to your class group."
   ],
-  "ValueMessage": [
-    "Great work yesterday! You accomplished a lot. This certainly will lead you to an amazing project outcome. Continue to focus on being self-aware of anything that may get in your way. You are on your way to becoming your \"best self\"."
-  ]
+  "ActiveProjects": [
+    "Climate Change in Arcadia, AZ",
+    "Displacement of People Impacted by Climate Disasters",
+    "Urban Heat Islands"
+  ]  
 };
 
 export default function SidebarMorningPulse({
@@ -53,7 +53,7 @@ export default function SidebarMorningPulse({
   userEmail = 'user@example.com',
   
   // Text customization props
-  pulseHeaderTitle = "🌿 Breathe In, Begin Now 🚀",
+  pulseHeaderTitle = "Breathe In, Begin Now",
   emojiSelectorTitle = "How are you feeling today?",
   textInputTitle = "What's your energy focused on today?",
   textInputPlaceholder = "Today I'm feeling... / My energy is directed toward... / I'm focusing on...",
@@ -101,7 +101,10 @@ export default function SidebarMorningPulse({
     resetForm
   } = state;
 
-  const [motivation, setMotivation] = React.useState("");  
+  const [motivation, setMotivation] = React.useState(""); 
+  const [updatedDashboardData, setUpdatedDashboardData] = React.useState(dashboardData);
+   
+
   // Auto-expand functionality
   React.useEffect(() => {
     if (autoExpand && !isExpanded) {
@@ -110,6 +113,10 @@ export default function SidebarMorningPulse({
   }, [autoExpand, isExpanded, setIsExpanded]);
 
   const toggleExpanded = () => setIsExpanded(!isExpanded);
+
+  React.useEffect(() => {
+    console.log('Dashboard data updated:', updatedDashboardData);
+  }, [updatedDashboardData]);
 
 const handlePulseSubmit = () => {
   // Validation check
@@ -127,7 +134,13 @@ const handlePulseSubmit = () => {
       google.script.run
         .withSuccessHandler((motivationText) => {
           // Set the motivation message
-          setMotivation(motivationText || "Stay motivated and keep going!");
+          //setMotivation(motivationText || "Stay motivated and keep going!");
+          console.log('Received inspiration text:', motivationText);
+          const newDashboardData = {
+            ...updatedDashboardData,
+            ValueMessage: [motivationText || "Stay motivated and keep going!"]
+          };
+          setUpdatedDashboardData(newDashboardData);
           
           // Update state to show dashboard
           setIsLoadingPulse(false);
@@ -143,7 +156,8 @@ const handlePulseSubmit = () => {
 
   const handleReset = () => {
     resetForm();
-    setMotivation("");
+    //setMotivation("");
+    setUpdatedDashboardData(dashboardData);
   };
 
   const getStatusIcon = () => {
@@ -178,7 +192,7 @@ const StatusIconWithDot = () => (
     <div className="relative inline-flex">
       <StatusIcon className={`h-5 w-5 ${getIconColor()}`} />
       <span
-        className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ring-2 ring-white ${getStatusDot()}`}
+        className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${getStatusDot()}`}
       />
     </div>
   );
@@ -216,13 +230,13 @@ const StatusIconWithDot = () => (
 
           {currentStep === 'dashboard' && (
             <>
-            {motivation && (
+            {/* {motivation && (
                 <div className="mb-4 p-3 bg-emerald-100 text-emerald-800 rounded-lg text-center font-semibold">
                   {motivation}
                 </div>
-              )}
+              )} */}
             <DashboardView
-              dashboardData={dashboardData}
+              dashboardData={updatedDashboardData}
               onReset={showResetButton ? handleReset : null}
               welcomeTitle={dashboardWelcomeTitle}
               welcomeSubtitle={dashboardWelcomeSubtitle}
