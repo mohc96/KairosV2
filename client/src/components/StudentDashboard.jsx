@@ -6,12 +6,13 @@ import SidebarBreakTimer from './Break';
 import AboutMe from './AboutMe';
 import ExpertSearchComponent from './WhoCanHelp';
 import StudentProjects from './StudentProjects';
+import SidebarMorningPulse from './MorningPulse';
 
 export default function StudentDashboard({ email }) {
   return (
     <div>
       <IntroductionContainer />
-      <MorningPulse />
+      <SidebarMorningPulse />
       <CreateProject />
       <StudentProjects />
       <SidebarAdvice />
