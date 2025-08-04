@@ -653,7 +653,7 @@ export default function CreateProject() {
 
               <div className="mb-3">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Subject <span className="text-red-500">*</span>
+                  Focussed Subject <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <button
