@@ -37,6 +37,39 @@ export default function CreateProject() {
     { value: 'other', label: 'Other' }
   ];
 
+  const formatProjectForCopy = (data) => {
+    if (!data) return '';
+    
+    let formatted = `${data.project_title}\n`;
+    formatted += `${data.description}\n`;
+    formatted += `Subject Focus: ${data.subject_domain}\n\n`;
+    
+    data.stages?.forEach((stage, index) => {
+      formatted += `Stage ${index + 1}: ${stage.title}\n`;
+      formatted += `${'='.repeat(stage.title.length + 10)}\n\n`;
+      
+      stage.tasks?.forEach((task, taskIndex) => {
+        formatted += `Task ${taskIndex + 1}: ${task.title}\n`;
+        formatted += `Description: ${task.description}\n`;
+        formatted += `Standard: ${task.academic_standard}\n`;
+        if (task.resource_id) {
+          formatted += `Resource: ${task.resource_id.label} (${task.resource_id.url})\n`;
+        }
+        formatted += '\n';
+      });
+      
+      formatted += `✅ Gate: ${stage.gate.title}\n`;
+      formatted += `${stage.gate.description}\n`;
+      formatted += 'Checklist:\n';
+      stage.gate.checklist?.forEach(item => {
+        formatted += `• ${item}\n`;
+      });
+      formatted += '\n';
+    });
+    
+    return formatted;
+  };
+
 
   const toggleExpanded = () => setIsExpanded(!isExpanded);
 
@@ -579,13 +612,13 @@ export default function CreateProject() {
 
                   <div className="border-t border-purple-200 p-2">
                     <button 
-                      onClick={() => navigator.clipboard.writeText(
-                        view === 'text' ? projectOutput : JSON.stringify(projectData, null, 2)
-                      )}
-                      className="text-xs text-purple-600 hover:text-purple-900 transition-colors"
-                    >
-                      📋 Copy project
-                    </button>
+                    onClick={() => navigator.clipboard.writeText(
+                      view === 'text' ? projectOutput : formatProjectForCopy(projectData)
+                    )}
+                    className="text-xs text-purple-600 hover:bg-purple-100 transition-colors px-1 py-0.5 rounded"
+                  >
+                    📋 Copy project
+                  </button>
                   </div>
                 </div>
               )}
