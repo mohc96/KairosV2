@@ -11,13 +11,15 @@ export default function StudentDashboard({ email }) {
   return (
     <div>
       <IntroductionContainer />
-      <AboutMe />
       <MorningPulse />
-      <SidebarAdvice />
       <CreateProject />
-      <SidebarBreakTimer />
-      <ExpertSearchComponent />
       <StudentProjects />
+      <SidebarAdvice />
+      <ExpertSearchComponent />
+      <AboutMe />
+      <SidebarBreakTimer />
+      
+      
     </div>
   );
 }
