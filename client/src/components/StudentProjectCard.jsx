@@ -1,18 +1,7 @@
 import React from 'react';
 import { User, FileText, Loader2 } from 'lucide-react';
 import ProjectPreview from './ProjectPreview';
-
-
-
-
-
-// const ProjectPreview = ({ project }) => (
-//   <div className="bg-white border border-gray-100 rounded p-2">
-//     <div className="text-sm font-semibold text-gray-900 mb-1">{project.project_title}</div>
-//     <div className="text-xs text-gray-600 mb-2">{project.description}</div>
-//     <div className="text-xs text-blue-600 font-medium">Subject: {project.subject_domain}</div>
-//   </div>
-// );
+import  { useState } from 'react';
 
 export default function StudentProjectCard({ student, index, exportingStudent, onViewProject }) {
   const studentId = student.student;
@@ -28,21 +17,38 @@ export default function StudentProjectCard({ student, index, exportingStudent, o
     return 'bg-gray-400';
   };
 
+
+  const [status, setStatus] = useState('Pending for Approval');
+
+  const getColorClass = (status) => {
+    switch (status) {
+      case 'Approved':
+        return 'text-green-600';
+      case 'Rejected':
+        return 'text-red-600';
+      case 'Pending for Approval':
+      default:
+        return 'text-yellow-500';
+    }
+  };
+
+
+
+
+
+
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden">
-      {/* Student Header */}
+      
       <div className="p-1 bg-gray-50">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <div>
               <div className="font-medium text-gray-900 text-sm">
                 {student.FirstName} {student.Lastname}
               </div>
               <div className="text-xs text-gray-500">
                 {student.student}
-              </div>
-              <div className="text-xs text-blue-600 font-medium">
-                {student.Project.subject_domain}
               </div>
             </div>
           </div>
@@ -65,6 +71,38 @@ export default function StudentProjectCard({ student, index, exportingStudent, o
             )}
           </button>
         </div>
+
+
+
+
+        <div className="text-xs text-blue-600 font-medium">
+                {/* {student.Status} */}
+          
+              
+                <select
+  value={status}
+  onChange={(e) => setStatus(e.target.value)}
+  className={`text-xs font-semibold rounded px-2 py-1 border border-blue-300 focus:outline-none focus:ring-1 focus:ring-blue-400 ${getColorClass(status)}`}
+>
+  <option value="Pending for Approval" className="text-orange-600">
+    Pending for Approval
+  </option>
+  <option value="Approved" className="text-green-700">
+    Approved
+  </option>
+  <option value="Rejected" className="text-red-600">
+    Rejected
+  </option>
+</select>
+
+
+
+
+
+        </div>
+
+
+
       </div>
 
       {/* Project Preview */}

@@ -1,5 +1,5 @@
 import React from 'react';
-import StudentProjects from './StudentProjects';
+import StudentSubmissions from './StudentSubmissions';
 
 export default function TeacherDashboard({ email }) {
   const studentsData = [
@@ -7,6 +7,7 @@ export default function TeacherDashboard({ email }) {
       "student": "john@gmail.com",
       "FirstName": "John",
       "Lastname": "Doe",
+      "Status": "Pending for Approval",
       "Project": {
         "project_title": "Statistical Analysis of Mean, Median, Mode",
         "description": "Developing an interactive web application to explain and visualize the concepts of mean, median, and mode in mathematics.",
@@ -129,6 +130,7 @@ export default function TeacherDashboard({ email }) {
       "student": "jane@gmail.com",
       "FirstName": "Jane",
       "Lastname": "Hoper",
+      "Status": "Pending for Approval",
       "Project": {
         "project_title": "Photosynthesis Explained",
         "description": "An educational project aimed at explaining the process of photosynthesis in plants",
@@ -215,6 +217,7 @@ export default function TeacherDashboard({ email }) {
       "student": "frank@gmail.com",
       "FirstName": "Frank",
       "Lastname": "Cooper",
+      "Status": "Pending for Approval",
       "Project": {
         "project_title": "Tyndall Effect Study",
         "description": "Investigating the Tyndall Effect phenomenon in science education",
@@ -298,7 +301,10 @@ export default function TeacherDashboard({ email }) {
       }
     }
   ];
-
+  const handleStatusChange = (studentId, newStatus) => {
+    // Handle status change at the dashboard level if needed
+    console.log(`Student ${studentId} status changed to ${newStatus}`);
+  };
   return (
     <div className="space-y-4 p-2">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -308,7 +314,10 @@ export default function TeacherDashboard({ email }) {
         </p>
       </div>
       
-      <StudentProjects studentsData={studentsData} />
+          <StudentSubmissions 
+      studentsData={studentsData} 
+      onStatusChange={handleStatusChange}
+    />
     </div>
   );
 }

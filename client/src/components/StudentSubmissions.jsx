@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import StudentProjectCard from './StudentProjectCard';
 
-export default function StudentProjects(props) {
+export default function StudentSubmissions(props) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [exportingStudent, setExportingStudent] = useState(null);
   const [debugInfo, setDebugInfo] = useState('');
