@@ -19,7 +19,7 @@ function currentUser()
 
 
   function getUserEmail() {
-    var user_email = "teacher1@gmail.com";//currentUser();
+    var user_email = currentUser();
     const identity_url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/identity-fetch';
     const payload = {
       email_id: user_email,
