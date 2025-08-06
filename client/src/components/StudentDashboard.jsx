@@ -5,17 +5,19 @@ import CreateProject from './CreateProject';
 import SidebarBreakTimer from './Break';
 import AboutMe from './AboutMe';
 import ExpertSearchComponent from './WhoCanHelp';
+import StudentProjects from './StudentProjects';
 
 export default function StudentDashboard({ email }) {
   return (
     <div>
       <IntroductionContainer />
-      <AboutMe />
       <MorningPulse />
-      <SidebarAdvice />
       <CreateProject />
-      <SidebarBreakTimer />
+      <StudentProjects />
+      <SidebarAdvice />
       <ExpertSearchComponent />
+      <AboutMe />
+      <SidebarBreakTimer />
     </div>
   );
 }

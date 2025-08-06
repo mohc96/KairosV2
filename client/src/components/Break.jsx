@@ -98,7 +98,7 @@ export default function SidebarBreakTimer() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <Coffee className={`w-6 h-6 ${getStatusColor()}`} />
+                <Coffee className={`w-5 h-5 ${getStatusColor()}`} />
                 <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${getStatusDot()}`}></div>
               </div>
               <div>

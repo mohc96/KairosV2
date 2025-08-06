@@ -8,6 +8,8 @@ export default function ExpertSearchComponent() {
   const [experts, setExperts] = useState([]);
   const [selectedExperts, setSelectedExperts] = useState(new Set());
   const [searchStatus, setSearchStatus] = useState('');
+  const [searchCompleted, setSearchCompleted] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   // Mock expert data for demonstration - using the JSON format
   const mockExpertsData = {
@@ -81,20 +83,53 @@ export default function ExpertSearchComponent() {
     
     setIsLoading(true);
     setSearchStatus('Searching for experts...');
+    setSearchCompleted(false);
+    setExperts([]);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
       setSearchStatus('Analyzing expertise...');
-      setTimeout(() => {
-        setSearchStatus('Compiling results...');
-        setTimeout(() => {
-          const convertedExperts = convertJsonToExperts(mockExpertsData);
-          setExperts(convertedExperts);
-          setIsLoading(false);
-          setSearchStatus('');
-        }, 800);
-      }, 1000);
-    }, 1200);
+      
+      // Call Google Apps Script function instead of direct fetch
+      const result = await new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject)
+          .findExperts(topic.trim());
+      });
+
+      setSearchStatus('Compiling results...');
+      
+      // Process the response
+      let expertsList = [];
+      if (result && result.json && Array.isArray(result.json)) {
+        expertsList = convertJsonToExperts(result);
+      } else if (result && Array.isArray(result)) {
+        expertsList = result.map((expert, index) => ({
+          id: index + 1,
+          name: expert.full_name || expert.name || 'Unknown',
+          organization: expert.organization || 'Unknown Organization',
+          bio: expert.bio || 'No bio available',
+          email: expert.email || 'No email provided',
+          skills: expert.skills || [],
+          tags: expert.tags || []
+        }));
+      }
+
+      setExperts(expertsList);
+      setSearchCompleted(true);
+      setIsLoading(false);
+      setSearchStatus('');
+
+    } catch (error) {
+      console.error('Error searching for experts:', error);
+      setSearchStatus('');
+      setIsLoading(false);
+      setSearchCompleted(true);
+      setExperts([]);
+      
+      // Show error message to user
+      alert('Sorry, there was an error searching for experts. Please try again.');
+    }
   };
 
   const toggleExpertSelection = (expertId) => {
@@ -122,14 +157,23 @@ export default function ExpertSearchComponent() {
   };
 
   const getStatusClass = () => {
+    if (isLoading) return 'text-orange-500';
+    if (searchCompleted && experts.length === 0) return 'text-red-500';
+    if (experts.length > 0) return 'text-green-500';
     return 'text-gray-600';
   };
 
   const getStatusDot = () => {
+    if (isLoading) return 'bg-orange-400';
+    if (searchCompleted && experts.length === 0) return 'bg-red-400';
+    if (experts.length > 0) return 'bg-green-400';
     return 'bg-gray-400';
   };
 
   const getStatusText = () => {
+    if (isLoading) return 'Searching...';
+    if (searchCompleted && experts.length === 0) return 'No experts found';
+    if (experts.length > 0) return 'Experts found!';
     return 'Find experts you need';
   };
 
@@ -137,9 +181,9 @@ export default function ExpertSearchComponent() {
     <div className="bg-white rounded-lg shadow-md p-6 mb-4 border border-gray-200 hover:shadow-lg transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-xl font-semibold text-gray-900 mb-1">{expert.name}</h3>
-          <p className="text-blue-600 font-medium mb-2">{expert.organization}</p>
-          <p className="text-gray-700 text-sm leading-relaxed">{expert.bio}</p>
+          <h3 className="text-base font-semibold text-gray-900 mb-1">{expert.name}</h3>
+          <p className="text-sm text-blue-600 font-medium mb-2">{expert.organization}</p>
+          <p className="text-gray-700 text-sm">{expert.bio}</p>
         </div>
         <div className="flex items-center space-x-2 ml-4">
           <input
@@ -185,7 +229,7 @@ export default function ExpertSearchComponent() {
   );
 
   return (
-    <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
+    <div className="max-w-md mx-auto bg-gray-50">
       {/* Collapsed Header - Always Visible */}
       <div className="w-full max-w-[300px] font-sans">
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm w-full overflow-hidden transition-all duration-200">
@@ -282,11 +326,26 @@ export default function ExpertSearchComponent() {
               </div>
             )}
 
+            {/* No Results Display */}
+            {searchCompleted && experts.length === 0 && !isLoading && (
+              <div className="mt-6">
+                <div className="text-center p-6 bg-red-50 rounded-lg border border-red-200">
+                  <div className="text-red-600 mb-2">
+                    <Search className="w-12 h-12 mx-auto opacity-50" />
+                  </div>
+                  <h3 className="text-lg font-medium text-red-800 mb-2">No Experts Found</h3>
+                  <p className="text-red-600 text-sm">
+                    We couldn't find any experts matching your search criteria. Try adjusting your search terms or being more general in your request.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Results Display */}
             {experts.length > 0 && !isLoading && (
               <div className="mt-6">
                 <div className="mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h2 className="text-base font-semibold text-gray-900 mb-2">
                     Found {experts.length} Expert{experts.length !== 1 ? 's' : ''}
                   </h2>
                   <p className="text-sm text-blue-700 bg-blue-50 p-3 rounded-lg border border-blue-200">
@@ -307,39 +366,44 @@ export default function ExpertSearchComponent() {
 
             {/* Action Buttons */}
             {selectedExperts.size > 0 && (
-              <div className="mt-6">
-                <div className="space-y-3">
-                  <button 
-                    onClick={() => {
-                      const selectedExpertsList = experts.filter(expert => selectedExperts.has(expert.id));
-                      const expertsText = selectedExpertsList.map(expert => 
-                        `${expert.name} - ${expert.organization}\nEmail: ${expert.email}\nBio: ${expert.bio}\nSkills: ${expert.skills.join(', ')}\nTags: ${expert.tags.join(', ')}`
-                      ).join('\n\n');
-                      navigator.clipboard.writeText(expertsText);
-                      alert('Expert information copied to clipboard!');
-                    }}
-                    className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200"
-                  >
-                    <span>📋</span>
-                    <span>Copy to clipboard</span>
-                  </button>
-
-                  <button
-                    onClick={() => alert("✅ Added to your project! (Mock)")}
-                    className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200"
-                  >
-                    <span>➕</span>
-                    <span>Add to Project</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => alert("📄 PDF download is not available yet (frontend only)")}
-                    className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200"
-                  >
-                    <span>📄</span>
-                    <span>Download as PDF</span>
-                  </button>
-                </div>
+              <div className="copy-section mt-6">
+                <button
+                  onClick={() => {
+                    const selectedExpertsList = experts.filter(expert => selectedExperts.has(expert.id));
+                    const expertsText = selectedExpertsList.map(expert => 
+                      `${expert.name} - ${expert.organization}\nEmail: ${expert.email}\nBio: ${expert.bio}\nSkills: ${expert.skills.join(', ')}\nTags: ${expert.tags.join(', ')}`
+                    ).join('\n\n');
+                    
+                    navigator.clipboard.writeText(expertsText).then(() => {
+                      setCopySuccess(true);
+                      setTimeout(() => setCopySuccess(false), 2000);
+                    }).catch(() => {
+                      // Fallback for older browsers or when clipboard API fails
+                      const textArea = document.createElement('textarea');
+                      textArea.value = expertsText;
+                      document.body.appendChild(textArea);
+                      textArea.select();
+                      document.execCommand('copy');
+                      document.body.removeChild(textArea);
+                      setCopySuccess(true);
+                      setTimeout(() => setCopySuccess(false), 2000);
+                    });
+                  }}
+                >
+                  {copySuccess ? '✅ Copied!' : '📋 Copy experts to clipboard'}
+                </button>
+                <button
+                  className="add-btn"
+                  onClick={() => alert("✅ Added to your project!")}
+                >
+                  ➕ Add to Project
+                </button>
+                <button
+                  className="pdf-btn"
+                  onClick={() => alert("📄 PDF download is not available yet")}
+                >
+                  📄 Download as PDF
+                </button>
               </div>
             )}
           </div>

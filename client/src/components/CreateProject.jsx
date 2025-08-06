@@ -37,6 +37,39 @@ export default function CreateProject() {
     { value: 'other', label: 'Other' }
   ];
 
+  const formatProjectForCopy = (data) => {
+    if (!data) return '';
+    
+    let formatted = `${data.project_title}\n`;
+    formatted += `${data.description}\n`;
+    formatted += `Subject Focus: ${data.subject_domain}\n\n`;
+    
+    data.stages?.forEach((stage, index) => {
+      formatted += `Stage ${index + 1}: ${stage.title}\n`;
+      formatted += `${'='.repeat(stage.title.length + 10)}\n\n`;
+      
+      stage.tasks?.forEach((task, taskIndex) => {
+        formatted += `Task ${taskIndex + 1}: ${task.title}\n`;
+        formatted += `Description: ${task.description}\n`;
+        formatted += `Standard: ${task.academic_standard}\n`;
+        if (task.resource_id) {
+          formatted += `Resource: ${task.resource_id.label} (${task.resource_id.url})\n`;
+        }
+        formatted += '\n';
+      });
+      
+      formatted += `✅ Gate: ${stage.gate.title}\n`;
+      formatted += `${stage.gate.description}\n`;
+      formatted += 'Checklist:\n';
+      stage.gate.checklist?.forEach(item => {
+        formatted += `• ${item}\n`;
+      });
+      formatted += '\n';
+    });
+    
+    return formatted;
+  };
+
 
   const toggleExpanded = () => setIsExpanded(!isExpanded);
 
@@ -117,7 +150,7 @@ export default function CreateProject() {
     } catch (error) {
       console.error('Error calling generateProject:', error);
       setProjectOutput("I'm currently unable to connect to the project service. Please try again later.");
-      setHasProject(true);
+      setHasProject(false);
     } finally {
       setIsLoading(false);
     }
@@ -238,17 +271,17 @@ export default function CreateProject() {
 
   const getStatusClass = () => {
     if (isLocked) return 'text-red-600';
-    if (isEdited) return 'text-yellow-600';
+    if (isEdited) return 'text-orange-600';
     if (hasProject) return 'text-green-600';
-    if (isLoading) return 'text-blue-600';
+    if (isLoading) return 'text-yellow-600';
     return 'text-gray-600';
   };
 
   const getStatusDot = () => {
     if (isLocked) return 'bg-red-500';
-    if (isEdited) return 'bg-yellow-500';
+    if (isEdited) return 'bg-orange-500';
     if (hasProject) return 'bg-green-500';
-    if (isLoading) return 'bg-blue-500';
+    if (isLoading) return 'bg-yellow-500';
     return 'bg-gray-400';
   };
 
@@ -382,7 +415,7 @@ export default function CreateProject() {
             <div className="flex items-center gap-3">
               <div className="relative">
                 <FolderPlus className={`w-5 h-5 ${getStatusClass()}`} />
-                <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${getStatusDot()}`}></div>
+                <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${getStatusDot()}`}></div>
               </div>
               <div>
                 <div className="font-medium text-gray-900">Create Project</div>
@@ -579,31 +612,17 @@ export default function CreateProject() {
 
                   <div className="border-t border-purple-200 p-2">
                     <button 
-                      onClick={() => navigator.clipboard.writeText(
-                        view === 'text' ? projectOutput : JSON.stringify(projectData, null, 2)
-                      )}
-                      className="text-xs text-purple-600 hover:text-purple-900 transition-colors"
-                    >
-                      📋 Copy project
-                    </button>
+                    onClick={() => navigator.clipboard.writeText(
+                      view === 'text' ? projectOutput : formatProjectForCopy(projectData)
+                    )}
+                    className="text-xs text-purple-600 hover:bg-purple-100 transition-colors px-1 py-0.5 rounded"
+                  >
+                    📋 Copy project
+                  </button>
                   </div>
                 </div>
               )}
 
-              {/* Status */}
-              <div className={`text-center py-1 px-2 rounded-full text-xs font-medium inline-block mt-2 ${
-                isLocked ? 'bg-red-100 text-red-800' :
-                isEdited ? 'bg-yellow-100 text-yellow-800' :
-                hasProject ? 'bg-green-100 text-green-800' : 
-                isLoading ? 'bg-blue-100 text-blue-800' : 
-                'bg-gray-100 text-gray-700'
-              }`}>
-                {isLocked ? '🔒 Locked' :
-                 isEdited ? '✏️ Modified' :
-                 isLoading ? '🔄 Creating...' : 
-                 hasProject ? '✅ Created' : 
-                 '💡 Ready'}
-              </div>
 
               {/* Tips */}
               {!projectOutput && !isLoading && (
@@ -667,7 +686,7 @@ export default function CreateProject() {
 
               <div className="mb-3">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Subject <span className="text-red-500">*</span>
+                  Focussed Subject <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <button
@@ -717,7 +736,7 @@ export default function CreateProject() {
 
               <div className="bg-blue-50 border border-blue-200 p-2 rounded-lg">
                 <p className="text-xs text-blue-800">
-                  <strong>Example:</strong> "Task management app for students" or "Portfolio website with React"
+                  <strong>Example:</strong> "Website to explain Newton's Laws with animations" or "Quiz to test knowledge about U.S. presidents"
                 </p>
               </div>
             </div>
