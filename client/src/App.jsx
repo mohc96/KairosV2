@@ -8,6 +8,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Loader from './components/Loader';
 
 export default function App() {
+  // return(<div>
+  //   <TeacherDashboard />
+  // </div>
+
+
   const [isAuthorized, setIsAuthorized] = useState(null);
   const [userEmail, setUserEmail] = useState('');
   const [userRole, setUserRole] = useState(null);
