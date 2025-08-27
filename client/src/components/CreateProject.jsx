@@ -18,6 +18,7 @@ export default function CreateProject() {
   const [projectData, setProjectData] = useState(null);
   const [originalData, setOriginalData] = useState(null);
   const [isEdited, setIsEdited] = useState(false);
+  const [showLockDialog, setShowLockDialog] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [expandedStages, setExpandedStages] = useState({});
@@ -240,27 +241,25 @@ export default function CreateProject() {
   };
 
   const lockProject = () => {
-    if (hasLockedOnce) return; // Already locked, don’t allow again
-
-  const confirmed = window.confirm(
-    "Are you sure you want to lock and submit this project for teacher review?\n\n⚠️ You won’t be able to make any further edits."
-  );
-
-  if (!confirmed) return;
-
-  setIsLocked(true);
-  setHasLockedOnce(true);
-  setEditingItem(null);
-  console.log('✅ Project locked and submitted:', projectData);
+    if (hasLockedOnce) return; // Already locked, don't allow again
+    setShowLockDialog(true);
   };
 
-  const unlockProject = () => {
+  const confirmLockProject = () => {
+    setIsLocked(true);
+    setHasLockedOnce(true);
+    setEditingItem(null);
+    setShowLockDialog(false);
+    console.log('✅ Project locked and submitted:', projectData);
+  };
+
+  /*const unlockProject = () => {
     if (hasLockedOnce) {
     alert("You can't unlock this project after submitting it for review.");
     return;
   }
     setIsLocked(false);
-  };
+  };*/
 
   const resetChanges = () => {
     if (originalData) {
@@ -465,18 +464,61 @@ export default function CreateProject() {
                         </button>
                       )}
                       <button
-                        onClick={isLocked ? unlockProject : lockProject}
+                        onClick={lockProject}
                         className={`px-2 py-1 text-xs rounded transition-colors ${
                           isLocked 
                             ? 'bg-red-100 hover:bg-red-200 text-red-700' 
                             : 'bg-green-100 hover:bg-green-200 text-green-700'
                         }`}
-                        title={isLocked ? 'Unlock Project' : 'Lock & Submit'}
+                        title={isLocked ? 'Project Locked' : 'Lock & Submit'}
                       >
                         {isLocked ? <Unlock size={12} /> : <Lock size={12} />}
                       </button>
                     </>
                   )}
+                </div>
+              )}
+
+              {/* Lock Confirmation Dialog */}
+              {showLockDialog && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2">
+                  <div className="bg-white rounded-lg w-full max-w-sm mx-2">
+                    <div className="p-4 border-b border-gray-200">
+                      <div className="flex items-center gap-2">
+                        <Lock className="w-5 h-5 text-red-600" />
+                        <h2 className="text-lg font-semibold text-gray-900">Lock Project</h2>
+                      </div>
+                    </div>
+
+                    <div className="p-4">
+                      <p className="text-sm text-gray-700 mb-3">
+                        Are you sure you want to lock and submit this project for teacher review?
+                      </p>
+                      <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <span className="text-yellow-600 text-lg">⚠️</span>
+                          <p className="text-sm text-yellow-800">
+                            <strong>Warning:</strong> You won't be able to make any further edits after locking.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end gap-2 p-4 border-t border-gray-200">
+                      <button
+                        onClick={() => setShowLockDialog(false)}
+                        className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={confirmLockProject}
+                        className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                      >
+                        Lock & Submit
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
 
