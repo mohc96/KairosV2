@@ -108,6 +108,99 @@ function generateProject(prompt) {
   return JSON.stringify(result.json.project) || "No response available";
 }
 
+
+function lockProject(projectData) {
+  try {  
+    
+    // Prepare the data for the API call
+    const payload = {
+      projectId: projectData.id,
+      studentId: projectData.studentId || Session.getActiveUser().getEmail(),
+      projectTitle: projectData.title,
+      projectContent: projectData.content,
+      submissionTimestamp: new Date().toISOString(),
+      status: 'locked'
+    };
+    
+    // Make the API call to your backend
+    const response = UrlFetchApp.fetch('YOUR_BACKEND_API_URL/api/projects/lock', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer YOUR_API_TOKEN', // If you need authentication
+      },
+      payload: JSON.stringify(payload)
+    });
+    
+    const responseCode = response.getResponseCode();
+    const responseData = JSON.parse(response.getContentText());
+    
+    // Handle different response codes
+    if (responseCode === 200 || responseCode === 201) {
+      // Success
+      return {
+        success: true,
+        message: responseData.message || 'Project successfully locked and submitted for review!',
+        data: responseData.data
+      };
+    } else if (responseCode === 400) {
+      // Bad request
+      return {
+        success: false,
+        message: responseData.message || 'Invalid project data. Please check your project and try again.'
+      };
+    } else if (responseCode === 409) {
+      // Conflict - project already locked
+      return {
+        success: false,
+        message: 'This project is already locked and cannot be modified.'
+      };
+    } else {
+      // Other error codes
+      return {
+        success: false,
+        message: responseData.message || 'Server error occurred. Please try again later.'
+      };
+    }
+    
+  } catch (error) {
+    console.error('Error in lockProject function:', error);
+    
+    // Handle different types of errors
+    if (error.toString().includes('DNS error')) {
+      return {
+        success: false,
+        message: 'Network connection error. Please check your internet connection.'
+      };
+    } else if (error.toString().includes('timeout')) {
+      return {
+        success: false,
+        message: 'Request timed out. Please try again.'
+      };
+    } else {
+      return {
+        success: false,
+        message: 'An unexpected error occurred. Please contact support if the problem persists.'
+      };
+    }
+  }
+}
+
+// Optional: Helper function to validate project data before sending
+function validateProjectData(projectData) {
+  const requiredFields = ['id', 'title', 'content'];
+  
+  for (let field of requiredFields) {
+    if (!projectData[field]) {
+      throw new Error(`Missing required field: ${field}`);
+    }
+  }
+  
+  return true;
+}
+
+
+
 function processDailyCheckin(userInput) {
   console.log("this is from processDailyCheckin");
   const url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
