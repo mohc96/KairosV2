@@ -293,7 +293,6 @@ export default function CreateProject() {
   };
 
   // Improved Inline Editable Field Component
-    // Improved Inline Editable Field Component
   const InlineEditableField = ({ 
     value, 
     onSave, 
