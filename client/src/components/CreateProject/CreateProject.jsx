@@ -107,11 +107,18 @@ export default function CreateProject() {
     setShowLockDialog(true);
   };
 
-  const confirmLockProject = () => {
-    setIsLocked(true);
-    setHasLockedOnce(true);
-    setShowLockDialog(false);
-    console.log('✅ Project locked and submitted:', projectData);
+  const confirmLockProject = (result) => {
+    if (result && result.success){
+      setIsLocked(true);
+      setHasLockedOnce(true);
+      setShowLockDialog(false);
+      console.log('✅ Project locked and submitted:', result);
+    } else {
+    // Handle failure case - keep dialog open so user can see the error
+    console.log('❌ Project lock failed:', result);
+    // Don't close dialog here - let the dialog component handle showing the error
+  }
+    
   };
 
   const resetChanges = () => {
@@ -255,6 +262,7 @@ export default function CreateProject() {
         showDialog={showLockDialog}
         onConfirm={confirmLockProject}
         onCancel={() => setShowLockDialog(false)}
+        projectData={projectData}
       />
     </div>
   );
