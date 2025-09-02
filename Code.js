@@ -110,30 +110,38 @@ function generateProject(prompt) {
 
 
 function lockProject(projectData) {
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'
+  Logger.log(projectData)
   try {  
     
     // Prepare the data for the API call
     const payload = {
-      projectId: projectData.id,
-      studentId: projectData.studentId || Session.getActiveUser().getEmail(),
-      projectTitle: projectData.title,
-      projectContent: projectData.content,
-      submissionTimestamp: new Date().toISOString(),
-      status: 'locked'
-    };
-    
-    // Make the API call to your backend
-    const response = UrlFetchApp.fetch('YOUR_BACKEND_API_URL/api/projects/lock', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer YOUR_API_TOKEN', // If you need authentication
+      action: "saveproject",
+      payload: {
+        json: {
+          project:projectData
+        },
+        user_id: "23e228fa-4592-4bdc-852e-192973c388ce"
       },
-      payload: JSON.stringify(payload)
-    });
+    };
+
+    //Logger.log(JSON.stringify(payload))
+
+    const options = {
+      method: 'POST',
+      ContentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    }
+    
+    // Make the API call to the backend
+    const response = UrlFetchApp.fetch(baseUrl, options);
     
     const responseCode = response.getResponseCode();
     const responseData = JSON.parse(response.getContentText());
+
+    Logger.log(responseCode)
+    Logger.log(responseData)
     
     // Handle different response codes
     if (responseCode === 200 || responseCode === 201) {
@@ -184,19 +192,6 @@ function lockProject(projectData) {
       };
     }
   }
-}
-
-// Optional: Helper function to validate project data before sending
-function validateProjectData(projectData) {
-  const requiredFields = ['id', 'title', 'content'];
-  
-  for (let field of requiredFields) {
-    if (!projectData[field]) {
-      throw new Error(`Missing required field: ${field}`);
-    }
-  }
-  
-  return true;
 }
 
 
