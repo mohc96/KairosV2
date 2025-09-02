@@ -111,6 +111,7 @@ function generateProject(prompt) {
 
 function lockProject(projectData) {
   const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'
+  Logger.log(projectData)
   try {  
     
     // Prepare the data for the API call
@@ -139,6 +140,9 @@ function lockProject(projectData) {
     const responseCode = response.getResponseCode();
     const responseData = JSON.parse(response.getContentText());
 
+    Logger.log(responseCode)
+    Logger.log(responseData)
+    
     // Handle different response codes
     if (responseCode === 200 || responseCode === 201) {
       // Success
