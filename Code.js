@@ -108,6 +108,90 @@ function generateProject(prompt) {
   return JSON.stringify(result.json.project) || "No response available";
 }
 
+
+function lockProject(projectData) {
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'
+  try {  
+    
+    // Prepare the data for the API call
+    const payload = {
+      action: "saveproject",
+      payload: {
+        json: {
+          project:projectData
+        },
+        user_id: "23e228fa-4592-4bdc-852e-192973c388ce"
+      },
+    };
+
+    //Logger.log(JSON.stringify(payload))
+
+    const options = {
+      method: 'POST',
+      ContentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    }
+    
+    // Make the API call to the backend
+    const response = UrlFetchApp.fetch(baseUrl, options);
+    
+    const responseCode = response.getResponseCode();
+    const responseData = JSON.parse(response.getContentText());
+
+    // Handle different response codes
+    if (responseCode === 200 || responseCode === 201) {
+      // Success
+      return {
+        success: true,
+        message: responseData.message || 'Project successfully locked and submitted for review!',
+        data: responseData.data
+      };
+    } else if (responseCode === 400) {
+      // Bad request
+      return {
+        success: false,
+        message: responseData.message || 'Invalid project data. Please check your project and try again.'
+      };
+    } else if (responseCode === 409) {
+      // Conflict - project already locked
+      return {
+        success: false,
+        message: 'This project is already locked and cannot be modified.'
+      };
+    } else {
+      // Other error codes
+      return {
+        success: false,
+        message: responseData.message || 'Server error occurred. Please try again later.'
+      };
+    }
+    
+  } catch (error) {
+    console.error('Error in lockProject function:', error);
+    
+    // Handle different types of errors
+    if (error.toString().includes('DNS error')) {
+      return {
+        success: false,
+        message: 'Network connection error. Please check your internet connection.'
+      };
+    } else if (error.toString().includes('timeout')) {
+      return {
+        success: false,
+        message: 'Request timed out. Please try again.'
+      };
+    } else {
+      return {
+        success: false,
+        message: 'An unexpected error occurred. Please contact support if the problem persists.'
+      };
+    }
+  }
+}
+
+
+
 function processDailyCheckin(userInput) {
   console.log("this is from processDailyCheckin");
   const url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
