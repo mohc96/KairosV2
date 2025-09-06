@@ -1,7 +1,7 @@
 import IntroductionContainer from './IntroductionContainer';
 import MorningPulse from './MorningPulse';
 import SidebarAdvice from './Advice';
-import CreateProject from './CreateProject';
+import CreateProject from './CreateProject/CreateProject';
 import SidebarBreakTimer from './Break';
 import AboutMe from './AboutMe';
 import ExpertSearchComponent from './WhoCanHelp';
@@ -11,13 +11,18 @@ export default function StudentDashboard({ email }) {
   return (
     <div>
       <IntroductionContainer />
-      <AboutMe />
       <MorningPulse />
-      <SidebarAdvice />
       <CreateProject />
-      <SidebarBreakTimer />
-      <ExpertSearchComponent />
       <StudentProjects />
+      <SidebarAdvice />
+      <ExpertSearchComponent />
+<<<<<<< HEAD
+      <StudentProjects />
+||||||| b9f5cb3
+=======
+      <AboutMe />
+      <SidebarBreakTimer />
+>>>>>>> staging
     </div>
   );
 }

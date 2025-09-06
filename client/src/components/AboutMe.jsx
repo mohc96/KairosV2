@@ -30,6 +30,7 @@ export default function AboutMe() {
     }));
   };
 
+<<<<<<< HEAD
   // Handle array inputs
   const addToArray = (field, inputKey) => {
     const value = inputValues[inputKey].trim();
@@ -158,9 +159,138 @@ export default function AboutMe() {
       formData.skills.length > 0
     ].filter(Boolean).length;
     return `${completedFields}/4 sections completed`;
+||||||| b9f5cb3
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // TODO: handle form submission logic
+=======
+  // Handle array inputs
+  const addToArray = (field, inputKey) => {
+    const value = inputValues[inputKey].trim();
+    if (value && !formData[field].includes(value)) {
+      setFormData(prev => ({
+        ...prev,
+        [field]: [...prev[field], value]
+      }));
+      setInputValues(prev => ({
+        ...prev,
+        [inputKey]: ''
+      }));
+    }
+  };
+
+  // Remove from array
+  const removeFromArray = (field, item) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].filter(i => i !== item)
+    }));
+  };
+
+  // Handle key press for adding items
+  const handleKeyPress = (e, field, inputKey) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addToArray(field, inputKey);
+    }
+  };
+
+  // Email validation
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Submit form
+  const handleSubmit = () => {
+    // Basic validation
+    const isEmailValid = formData.email_id && isValidEmail(formData.email_id);
+    const isBioValid = formData.bio && formData.bio.trim();
+
+    if (!isEmailValid || !isBioValid) {
+      setSubmitStatus('error');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    const payload = {
+      action: "aboutme",
+      payload: {
+        email_id: formData.email_id,
+        bio: formData.bio,
+        interests: formData.interests,
+        skills: formData.skills,
+        endorsements: formData.endorsements,
+        invitation: formData.invitation
+      }
+    };
+
+    // Simulating the Google Apps Script call for demo
+    setTimeout(() => {
+      setSubmitStatus('success');
+      setFormData({
+        email_id: '',
+        bio: '',
+        interests: [],
+        skills: [],
+        endorsements: [],
+        invitation: []
+      });
+      setIsSubmitting(false);
+    }, 2000);
+
+    google.script.run
+      .withSuccessHandler((result) => {
+        setSubmitStatus('success');
+        setFormData({
+          email_id: '',
+          bio: '',
+          interests: [],
+          skills: [],
+          endorsements: [],
+          invitation: []
+        });
+        console.log('Success:', result);
+        setIsSubmitting(false);
+      })
+      .withFailureHandler((error) => {
+        console.error('Error calling Apps Script:', error);
+        setSubmitStatus('error');
+        setIsSubmitting(false);
+      })
+      .submitFormToScript(payload);
+  };
+
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const getStatusColor = () => {
+    if (submitStatus === 'success') return 'text-green-600';
+    if (submitStatus === 'error') return 'text-red-600';
+    if (isSubmitting) return 'text-blue-600';
+    return 'text-gray-600';
+  };
+
+  const getStatusDot = () => {
+    if (submitStatus === 'success') return 'bg-green-500';
+    if (submitStatus === 'error') return 'bg-red-500';
+    if (isSubmitting) return 'bg-blue-500';
+    return 'bg-gray-400';
+  };
+
+  const getStatusText = () => {
+    if (submitStatus === 'success') return 'Tell us about yourself';
+    if (submitStatus === 'error') return 'Error occurred';
+    if (isSubmitting) return 'Submitting...';
+    return 'Tell us about yourself';
+>>>>>>> staging
   };
 
   return (
+<<<<<<< HEAD
     <div className="w-full font-sans">
       <div className="w-full bg-white border border-gray-200 rounded-lg shadow-sm transition-all duration-200">
         {/* Header Area */}
@@ -182,6 +312,37 @@ export default function AboutMe() {
               </div>
             </div>
             <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+||||||| b9f5cb3
+    <div className="aboutme-card-outer">
+      <div className="aboutme-card-inner">
+        <div className="aboutme-header-row" onClick={() => setIsExpanded(!isExpanded)}>
+          <div className="aboutme-header-icon"><User /></div>
+          <div className="aboutme-header-texts">
+            <div className="aboutme-title">About Me</div>
+            <div className="aboutme-subtitle">Tell us about yourself</div>
+=======
+    <div className="w-full font-sans">
+      <div className="w-full bg-white border border-gray-200 rounded-lg shadow-sm transition-all duration-200">
+        {/* Header Area */}
+        <div
+          onClick={toggleExpanded}
+          className="p-3 cursor-pointer hover:bg-gray-50 transition"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <User className={`w-5 h-5 ${getStatusColor()}`} />
+                <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${getStatusDot()}`}></div>
+              </div>
+              <div>
+                <div className="font-medium text-gray-900 text-base">About Me</div>
+                <div className="text-sm text-gray-500">
+                  {getStatusText()}
+                </div>
+              </div>
+            </div>
+            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+>>>>>>> staging
           </div>
         </div>
 
