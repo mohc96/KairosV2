@@ -16,13 +16,8 @@ export default function StudentDashboard({ email }) {
       <StudentProjects />
       <SidebarAdvice />
       <ExpertSearchComponent />
-<<<<<<< HEAD
-      <StudentProjects />
-||||||| b9f5cb3
-=======
       <AboutMe />
       <SidebarBreakTimer />
->>>>>>> staging
     </div>
   );
 }
