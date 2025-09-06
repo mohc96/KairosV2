@@ -366,92 +366,6 @@ export default function ExpertSearchComponent() {
 
             {/* Action Buttons */}
             {selectedExperts.size > 0 && (
-<<<<<<< HEAD
-              <div className="mt-6">
-                <div className="space-y-3">
-                  <button 
-                    onClick={() => {
-                      const selectedExpertsList = experts.filter(expert => selectedExperts.has(expert.id));
-                      const expertsText = selectedExpertsList.map(expert => 
-                        `${expert.name} - ${expert.organization}\nEmail: ${expert.email}\nBio: ${expert.bio}\nSkills: ${expert.skills.join(', ')}\nTags: ${expert.tags.join(', ')}`
-                      ).join('\n\n');
-                      
-                      navigator.clipboard.writeText(expertsText).then(() => {
-                        setCopySuccess(true);
-                        setTimeout(() => setCopySuccess(false), 2000);
-                      }).catch(() => {
-                        // Fallback for older browsers or when clipboard API fails
-                        const textArea = document.createElement('textarea');
-                        textArea.value = expertsText;
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(textArea);
-                        setCopySuccess(true);
-                        setTimeout(() => setCopySuccess(false), 2000);
-                      });
-                    }}
-                    className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200 ${
-                      copySuccess 
-                        ? 'bg-green-50 text-green-700 border-green-200' 
-                        : 'bg-white hover:bg-gray-50 text-gray-700'
-                    }`}
-                  >
-                    <span>{copySuccess ? '✅' : '📋'}</span>
-                    <span>{copySuccess ? 'Copied!' : 'Copy to clipboard'}</span>
-                  </button>
-
-                  <button
-                    onClick={() => alert("✅ Added to your project! (Mock)")}
-                    className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200"
-                  >
-                    <span>➕</span>
-                    <span>Add to Project</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => alert("📄 PDF download is not available yet (frontend only)")}
-                    className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200"
-                  >
-                    <span>📄</span>
-                    <span>Download as PDF</span>
-                  </button>
-                </div>
-||||||| b9f5cb3
-              <div className="mt-6">
-                <div className="space-y-3">
-                  <button 
-                    onClick={() => {
-                      const selectedExpertsList = experts.filter(expert => selectedExperts.has(expert.id));
-                      const expertsText = selectedExpertsList.map(expert => 
-                        `${expert.name} - ${expert.organization}\nEmail: ${expert.email}\nBio: ${expert.bio}\nSkills: ${expert.skills.join(', ')}\nTags: ${expert.tags.join(', ')}`
-                      ).join('\n\n');
-                      navigator.clipboard.writeText(expertsText);
-                      alert('Expert information copied to clipboard!');
-                    }}
-                    className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200"
-                  >
-                    <span>📋</span>
-                    <span>Copy to clipboard</span>
-                  </button>
-
-                  <button
-                    onClick={() => alert("✅ Added to your project! (Mock)")}
-                    className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200"
-                  >
-                    <span>➕</span>
-                    <span>Add to Project</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => alert("📄 PDF download is not available yet (frontend only)")}
-                    className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 border border-gray-200"
-                  >
-                    <span>📄</span>
-                    <span>Download as PDF</span>
-                  </button>
-                </div>
-=======
               <div className="copy-section mt-6">
                 <button
                   onClick={() => {
@@ -490,7 +404,6 @@ export default function ExpertSearchComponent() {
                 >
                   📄 Download as PDF
                 </button>
->>>>>>> staging
               </div>
             )}
           </div>

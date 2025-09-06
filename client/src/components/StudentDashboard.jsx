@@ -16,8 +16,6 @@ export default function StudentDashboard({ email }) {
       <StudentProjects />
       <SidebarAdvice />
       <ExpertSearchComponent />
-
-      <StudentProjects />
       <AboutMe />
       <SidebarBreakTimer />
     </div>
