@@ -3,6 +3,7 @@ import {
   FolderOpen, ChevronDown, ChevronRight, BookOpen, 
   Clock, Search, Filter
 } from 'lucide-react';
+import ProjectDetail from './ProjectDetail';
 
 export default function StudentProjects() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -11,6 +12,7 @@ export default function StudentProjects() {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
 
 
 
@@ -108,6 +110,17 @@ export default function StudentProjects() {
     if (projects.length === 0) return 'bg-gray-400';
     return 'bg-purple-500';
   };
+
+  const handleProjectClick = (projectId) => {
+    setSelectedProjectId(projectId);
+  };
+
+  const handleBackToList = () => {
+    setSelectedProjectId(null);
+  };
+  if (selectedProjectId) {
+    return <ProjectDetail projectId={selectedProjectId} onBack={handleBackToList} />;
+  }
 
   return (
     <div className="w-full max-w-[300px] font-sans">
@@ -221,7 +234,8 @@ export default function StudentProjects() {
                   {filteredProjects.map((project) => (
                     <div key={project.project_id} className="border border-gray-200 rounded-lg overflow-hidden">
                       {/* Project Card */}
-                      <div className="p-3 bg-white hover:bg-gray-50 transition-colors">
+                      <div className="p-3 bg-white hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => handleProjectClick(project.project_id)}>
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
                             <h3 className="text-sm font-medium text-gray-900 mb-1">

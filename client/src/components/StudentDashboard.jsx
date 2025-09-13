@@ -5,7 +5,7 @@ import CreateProject from './CreateProject/CreateProject';
 import SidebarBreakTimer from './Break';
 import AboutMe from './AboutMe';
 import ExpertSearchComponent from './WhoCanHelp';
-import StudentProjects from './StudentProjects';
+import StudentProjects from './StudentProjects/StudentProjects';
 
 export default function StudentDashboard({ email }) {
   return (
