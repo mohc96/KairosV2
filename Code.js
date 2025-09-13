@@ -35,7 +35,7 @@ function currentUser()
 
     const responseText = response.getContentText();
     const responseJson = JSON.parse(responseText);
-
+    PropertiesService.getUserProperties().setProperty('USER_ID', responseJson.user_id)
     return {
       statusCode: response.getResponseCode(),
       email: user_email,
