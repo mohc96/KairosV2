@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FolderPlus, ChevronDown, Lightbulb } from 'lucide-react';
 
-// Import the new components (you'll need to adjust paths based on your structure)
 import ProjectDialog from './ProjectDialog';
 import ProjectControls from './ProjectControls';
 import LockConfirmationDialog from './LockConfirmationDialog';
