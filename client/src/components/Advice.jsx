@@ -41,7 +41,7 @@ export default function SidebarAdvice() {
         setHasAdvice(true);
         setIsLoading(false);
       })
-      .callOpenAI(fullPrompt);
+      .getAdvice(fullPrompt);
   };
 
   const handleKeyPress = (e) => {

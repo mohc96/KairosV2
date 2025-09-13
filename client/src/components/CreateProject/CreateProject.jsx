@@ -4,7 +4,6 @@ import { FolderPlus, ChevronDown, Lightbulb } from 'lucide-react';
 import ProjectDialog from './ProjectDialog';
 import ProjectControls from './ProjectControls';
 import LockConfirmationDialog from './LockConfirmationDialog';
-import InlineEditableField from '../InlineEditableField';
 import useProjectEditor from '../../hooks/useProjectEditor';
 import ProjectViewer from './ProjectViewer';
 

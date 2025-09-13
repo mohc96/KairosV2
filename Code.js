@@ -18,7 +18,7 @@ function currentUser()
 }
 
 
-  function getUserEmail() {
+  function validateUser() {
     var user_email = currentUser();
     const identity_url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/identity-fetch';
     const payload = {
@@ -42,7 +42,7 @@ function currentUser()
       role: responseJson.role
     }
   }
-  function callOpenAI(prompt) {
+  function getAdvice(prompt) {
   const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
 
   const payload = {

@@ -23,7 +23,7 @@ export default function App() {
           setIsAuthorized(false);
         }
       })
-      .getUserEmail();
+      .validateUser();
   }, []);
 
   if (isAuthorized === null) return <Loader />;
