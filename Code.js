@@ -64,8 +64,6 @@ function currentUser()
     const response = UrlFetchApp.fetch(baseUrl, options);
     const result = JSON.parse(response.getContentText());
 
-    Logger.log("🔁 Full advice response:");
-    Logger.log(result);
 
     // ✅ Return the entire object — not just result.recommendation.advice
     return result;
@@ -140,8 +138,6 @@ function lockProject(projectData) {
     const responseCode = response.getResponseCode();
     const responseData = JSON.parse(response.getContentText());
 
-    Logger.log(responseCode)
-    Logger.log(responseData)
     
     // Handle different response codes
     if (responseCode === 200 || responseCode === 201) {
@@ -194,10 +190,53 @@ function lockProject(projectData) {
   }
 }
 
+function getStudentProjects(){
+  try {
+    const url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
 
+    const payload = {
+      action: "myprojects",
+      payload:{
+        user_id:"23e228fa-4592-4bdc-852e-192973c388ce",
+        request:"student_view_all"
+      }
+    }
+
+    const options = {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    }
+    
+    const response = UrlFetchApp.fetch(url, options);
+    
+    // Check if the HTTP request itself failed
+    if (response.getResponseCode() !== 200) {
+      throw new Error(`HTTP Error: ${response.getResponseCode()} - ${response.getContentText()}`);
+    }
+    
+    const result = JSON.parse(response.getContentText());
+    
+    // Check if the API returned an error in the response body
+    if (!result || result.statusCode !== 200) {
+      throw new Error(`API Error: ${result?.statusCode || 'Unknown'} - ${result?.message || 'Unknown error'}`);
+    }
+    
+    return result;
+    
+  } catch (error) {
+    console.error('Error in getStudentProjects:', error);
+    // Return an error object that your React component can handle
+    return {
+      statusCode: 500,
+      error: error.toString(),
+      body: null
+    };
+  }
+}
 
 function processDailyCheckin(userInput) {
-  console.log("this is from processDailyCheckin");
   const url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
   
   const payload = {
