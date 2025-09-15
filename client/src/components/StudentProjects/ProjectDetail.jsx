@@ -23,8 +23,8 @@ export default function ProjectDetail({ projectId, onBack }) {
     
     google.script.run
       .withSuccessHandler((result) => {
-        if (result && result.statusCode === 200 && result.body && result.body.json) {
-          setProject(result.body.json.project);
+        if (result && result.action_response && result.action_response.json) {
+          setProject(result.action_response.json.project);
         } else {
           setError('Invalid response format');
         }

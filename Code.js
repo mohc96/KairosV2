@@ -103,7 +103,7 @@ function generateProject(prompt) {
   const response = UrlFetchApp.fetch(baseUrl, options);
   const result = JSON.parse(response.getContentText());
 
-  return JSON.stringify(result.json.project) || "No response available";
+  return JSON.stringify(result.action_response.response.project) || "No response available";
 }
 
 
@@ -134,37 +134,14 @@ function lockProject(projectData) {
     
     // Make the API call to the backend
     const response = UrlFetchApp.fetch(baseUrl, options);
-    
-    const responseCode = response.getResponseCode();
+
     const responseData = JSON.parse(response.getContentText());
 
     
     // Handle different response codes
-    if (responseCode === 200 || responseCode === 201) {
-      // Success
-      return {
-        success: true,
-        message: responseData.message || 'Project successfully locked and submitted for review!',
-        data: responseData.data
-      };
-    } else if (responseCode === 400) {
-      // Bad request
-      return {
-        success: false,
-        message: responseData.message || 'Invalid project data. Please check your project and try again.'
-      };
-    } else if (responseCode === 409) {
-      // Conflict - project already locked
-      return {
-        success: false,
-        message: 'This project is already locked and cannot be modified.'
-      };
-    } else {
-      // Other error codes
-      return {
-        success: false,
-        message: responseData.message || 'Server error occurred. Please try again later.'
-      };
+    return {
+      success: true,
+      message: responseData.action_response.response || 'Project successfully locked and submitted for review!',
     }
     
   } catch (error) {
@@ -219,8 +196,8 @@ function getStudentProjects(){
     const result = JSON.parse(response.getContentText());
     
     // Check if the API returned an error in the response body
-    if (!result || result.statusCode !== 200) {
-      throw new Error(`API Error: ${result?.statusCode || 'Unknown'} - ${result?.message || 'Unknown error'}`);
+    if (!result || result.status !== "success") {
+      throw new Error(`API Error: ${result?.status || 'Unknown'} - ${result?.message || 'Unknown error'}`);
     }
     
     return result;
@@ -266,8 +243,8 @@ function getProjectDetails(projectId){
     const result = JSON.parse(response.getContentText());
     
     // Check if the API returned an error in the response body
-    if (!result || result.statusCode !== 200) {
-      throw new Error(`API Error: ${result?.statusCode || 'Unknown'} - ${result?.message || 'Unknown error'}`);
+    if (!result || result.status !== "success") {
+      throw new Error(`API Error: ${result?.status || 'Unknown'} - ${result?.message || 'Unknown error'}`);
     }
     
     return result;
