@@ -35,7 +35,9 @@ function currentUser()
 
     const responseText = response.getContentText();
     const responseJson = JSON.parse(responseText);
-    PropertiesService.getUserProperties().setProperty('USER_ID', responseJson.user_id)
+    if (response.getResponseCode()==200){
+      PropertiesService.getUserProperties().setProperty('USER_ID', responseJson.user_id)
+    }
     return {
       statusCode: response.getResponseCode(),
       email: user_email,
@@ -89,7 +91,7 @@ function generateProject(prompt) {
     action: "createproject",
     payload: {
       message: prompt,
-      email_id: currentUser(),
+      email_id: 'mindspark.user1@schoolfuel.org',
     }
   };
 
@@ -119,7 +121,8 @@ function lockProject(projectData) {
         json: {
           project:projectData
         },
-        user_id: "23e228fa-4592-4bdc-852e-192973c388ce"
+        user_id: "23e228fa-4592-4bdc-852e-192973c388ce",
+        email_id: 'mindspark.user1@schoolfuel.org',
       },
     };
 
