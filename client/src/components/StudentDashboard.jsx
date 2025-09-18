@@ -7,6 +7,7 @@ import ExpertSearchComponent from './WhoCanHelp';
 import StudentProjects from './StudentProjects/StudentProjects';
 import SidebarMorningPulse from './MorningPulse';
 import SidebarAIChat from './SidebarAIChat';
+import IntegratedProjectCreator from './IntegratedProjectCreator';
 
 export default function StudentDashboard({ email }) {
   return (
@@ -18,6 +19,7 @@ export default function StudentDashboard({ email }) {
       <SidebarAdvice />
       <SidebarAIChat />
       <ExpertSearchComponent />
+      <IntegratedProjectCreator />
       <AboutMe />
       <SidebarBreakTimer />
     </div>
