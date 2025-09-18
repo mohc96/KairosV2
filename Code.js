@@ -285,7 +285,7 @@ function processDailyCheckin(userInput) {
   try {
     const response = UrlFetchApp.fetch(url, options);
 
-    console.log('API Response Status:', response.getResponseCode());
+    console.log('API Response Status:', JSON.stringify(response));
     
     const result = JSON.parse(response.getContentText());
     console.log('API Response:', result);
@@ -293,7 +293,7 @@ function processDailyCheckin(userInput) {
       console.log("status 200 received")
     
     // Return the project data or fallback message
-    return JSON.parse(JSON.stringify(result?.motivation)) || "No response available";
+    return JSON.parse(JSON.stringify(result?.action_response?.motivation)) || "No response available";
   } catch (error) {
     console.error('Error processing daily check-in:', error.toString());
     
