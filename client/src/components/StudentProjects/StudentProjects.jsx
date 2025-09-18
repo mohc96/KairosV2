@@ -14,6 +14,10 @@ export default function StudentProjects() {
   const [error, setError] = useState(null);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
 
+  const fetchProjects=()=>{
+    setProjects([]);
+    setError(null);
+  }
 
 
 // Load projects when component expands
@@ -24,9 +28,9 @@ export default function StudentProjects() {
     
     google.script.run
       .withSuccessHandler((result) => {
-        if (result && result.statusCode === 200 && result.body && result.body.projects) {
+        if (result && result.action_response && result.action_response.projects) {
           // Map the API response to match your component's expected structure
-          const mappedProjects = result.body.projects.map(project => ({
+          const mappedProjects = result.action_response.projects.map(project => ({
             project_id: project.project_id,
             project_title: project.title,
             description: `${project.subject_domain} project - ${project.status}`,
@@ -45,7 +49,7 @@ export default function StudentProjects() {
         setError(error.message || 'Failed to load projects');
         setIsLoading(false);
       })
-      .getStudentProjects(); // Replace with your actual function name
+      .getStudentProjects();
   }
 }, [isExpanded, projects.length, error]);
 
