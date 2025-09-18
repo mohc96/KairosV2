@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FolderPlus, ChevronDown, Lightbulb } from 'lucide-react';
+import { FolderPlus, ChevronDown } from 'lucide-react';
 
 import ProjectDialog from './ProjectDialog';
 import ProjectControls from './ProjectControls';
@@ -23,6 +23,10 @@ export default function CreateProject() {
   const [isLocked, setIsLocked] = useState(false);
   const [hasLockedOnce, setHasLockedOnce] = useState(false);
   const [view, setView] = useState('text'); // 'text' or 'structured'
+  const [streamedContent, setStreamedContent] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [wsConnection, setWsConnection] = useState(null);
+  const [wsStatus, setWsStatus] = useState('disconnected');
 
   // Custom hook for project editing functionality
   const projectEditor = useProjectEditor();
@@ -36,58 +40,185 @@ export default function CreateProject() {
   }, [projectData, originalData]);
 
   const handleProjectSubmit = async (userInput, selectedSubject) => {
-    setIsLoading(true);
-    setProjectOutput('');
-    setShowDialog(false);
+  setIsLoading(true);
+  setIsStreaming(true);
+  setProjectOutput('');
+  setStreamedContent('');
+  setShowDialog(false);
+  setWsStatus('connecting');
 
-    try {
-      const subjects = [
-        { value: 'mathematics', label: 'Mathematics' },
-        { value: 'science', label: 'Science' },
-        { value: 'english', label: 'English' },
-        { value: 'history', label: 'History' },
-        { value: 'art', label: 'Art' },
-        { value: 'technology', label: 'Technology' },
-        { value: 'other', label: 'Other' }
-      ];
+  try {
+    const subjects = [
+      { value: 'mathematics', label: 'Mathematics' },
+      { value: 'science', label: 'Science' },
+      { value: 'english', label: 'English' },
+      { value: 'history', label: 'History' },
+      { value: 'art', label: 'Art' },
+      { value: 'technology', label: 'Technology' },
+      { value: 'other', label: 'Other' }
+    ];
 
-      const promptWithSubject = `${userInput} (Subject: ${subjects.find(s => s.value === selectedSubject)?.label})`;
-      const result = await new Promise((resolve, reject) => {
-        if (typeof google !== 'undefined' && google.script) {
-          google.script.run
-            .withSuccessHandler(resolve)
-            .withFailureHandler(reject)
-            .generateProject(promptWithSubject);
-        } 
-      });
+    // Get user email (replace with your actual user email retrieval)
+    const userEmail = "mindspark.user1@schoolfuel.org";
+    
+    const subjectLabel = subjects.find(s => s.value === selectedSubject)?.label;
+    const message = `${userInput}, Subject: ${subjectLabel}`;
 
-      // Parse the result
-      let parsedData;
-      let textOutput;
-      
-      try {
-        parsedData = JSON.parse(result);
-        textOutput = `Subject: ${selectedSubject}\nGenerated project for: ${userInput}\n\nProject includes ${parsedData.stages?.length || 0} stages with structured tasks and gates.`;
-        setProjectData(parsedData);
-        setOriginalData(JSON.parse(JSON.stringify(parsedData)));
-        setView('structured');
-      } catch (parseError) {
-        console.warn('Could not parse as JSON, treating as text:', parseError);
-        textOutput = result || "Project generated successfully";
-        setView('text');
+    // WebSocket connection
+    const ws = new WebSocket('wss://s7pmpoc37f.execute-api.us-west-1.amazonaws.com/prod/'); // Replace with your WebSocket URL
+    setWsConnection(ws);
+
+    // Add connection timeout
+    const connectionTimeout = setTimeout(() => {
+      if (ws.readyState === WebSocket.CONNECTING) {
+        ws.close();
+        setWsStatus('disconnected');
+        setIsStreaming(false);
+        setIsLoading(false);
+        setProjectOutput("Connection timeout. Please try again.");
       }
+    }, 10000); // 10 second timeout
 
-      setProjectOutput(textOutput);
-      setHasProject(true);
+    ws.onopen = () => {
+      console.log('WebSocket connected');
+      clearTimeout(connectionTimeout);
+      setWsStatus('connected');
       
-    } catch (error) {
-      console.error('Error calling generateProject:', error);
-      setProjectOutput("I'm currently unable to connect to the project service. Please try again later.");
-      setHasProject(false);
-    } finally {
+      // Send the request
+      const requestPayload = {
+        action: "testing",
+        payload: {
+          email_id: userEmail,
+          message: message
+        }
+      };
+      
+      console.log('Sending WebSocket message:', requestPayload);
+      ws.send(JSON.stringify(requestPayload));
+    };
+
+    ws.onmessage = (event) => {
+      const chunk = event.data;
+      console.log('WebSocket chunk received:', chunk);
+      
+      // Check for end marker
+      if (chunk.includes('__END__')) {
+        // Remove the end marker and add any remaining content
+        const finalChunk = chunk.replace('__END__', '');
+        if (finalChunk.trim()) {
+          setStreamedContent(prev => {
+            const newContent = prev + finalChunk;
+            console.log('Final content:', newContent);
+            return newContent;
+          });
+        }
+        
+        // Small delay to ensure final content is rendered
+        setTimeout(() => {
+          handleStreamComplete();
+        }, 100);
+        
+        ws.close();
+        return;
+      }
+      
+      // Append chunk to streamed content with immediate state update
+      setStreamedContent(prev => {
+        const newContent = prev + chunk;
+        console.log('Streaming content updated:', newContent.length, 'characters');
+        return newContent;
+      });
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      clearTimeout(connectionTimeout);
+      setWsStatus('disconnected');
+      setProjectOutput("Connection error occurred. Please check your connection and try again.");
+      setIsStreaming(false);
       setIsLoading(false);
+      setHasProject(false);
+      ws.close();
+    };
+
+    ws.onclose = (event) => {
+      console.log('WebSocket closed:', event.code, event.reason);
+      clearTimeout(connectionTimeout);
+      setWsConnection(null);
+      setWsStatus('disconnected');
+      
+      if (event.code !== 1000 && isStreaming) {
+        // Abnormal closure during streaming
+        setProjectOutput("Connection was lost. Please try again.");
+        setIsLoading(false);
+        setIsStreaming(false);
+        setHasProject(false);
+      }
+    };
+
+  } catch (error) {
+    console.error('Error setting up WebSocket:', error);
+    setWsStatus('disconnected');
+    setProjectOutput("Failed to establish connection. Please try again later.");
+    setHasProject(false);
+    setIsLoading(false);
+    setIsStreaming(false);
+  }
+};
+
+
+const handleStreamComplete = () => {
+  console.log('Stream completed, processing final content...');
+  
+  setIsStreaming(false);
+  setIsLoading(false);
+  setWsStatus('disconnected');
+  
+  // Get the complete streamed content
+  setStreamedContent(currentContent => {
+    console.log('Processing complete content:', currentContent);
+    
+    // Try to parse as JSON first
+    let parsedData;
+    let textOutput;
+    
+    try {
+      parsedData = JSON.parse(currentContent);
+      textOutput = `Generated project with ${parsedData.stages?.length || 0} stages`;
+      setProjectData(parsedData);
+      setOriginalData(JSON.parse(JSON.stringify(parsedData)));
+      setView('structured');
+      console.log('Successfully parsed JSON:', parsedData);
+    } catch (parseError) {
+      console.warn('Could not parse streamed content as JSON, treating as text:', parseError);
+      textOutput = currentContent || "Project generated successfully";
+      setView('text');
+    }
+
+    setProjectOutput(textOutput);
+    setHasProject(true);
+    
+    return currentContent; // Return unchanged content
+  });
+};
+
+// Add cleanup function for component unmount
+useEffect(() => {
+  return () => {
+    if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
+      console.log('Cleaning up WebSocket connection');
+      wsConnection.close();
+      setWsStatus('disconnected');
     }
   };
+}, [wsConnection]);
+
+const debugStreamedContent = () => {
+  console.log('Current streamed content:', streamedContent);
+  console.log('Content length:', streamedContent.length);
+  console.log('Is streaming:', isStreaming);
+  console.log('WebSocket status:', wsStatus);
+};
 
   const handleClear = () => {
     setProjectOutput('');
