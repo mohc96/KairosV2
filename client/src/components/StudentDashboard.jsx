@@ -6,6 +6,7 @@ import SidebarBreakTimer from './Break';
 import AboutMe from './AboutMe';
 import ExpertSearchComponent from './WhoCanHelp';
 import StudentProjects from './StudentProjects';
+import SidebarWorkshop from './workshopbuilder';
 
 export default function StudentDashboard({ email }) {
   return (
@@ -13,6 +14,7 @@ export default function StudentDashboard({ email }) {
       <IntroductionContainer />
       <AboutMe />
       <MorningPulse />
+      <SidebarWorkshop />
       <SidebarAdvice />
       <CreateProject />
       <SidebarBreakTimer />
