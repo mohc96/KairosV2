@@ -1,5 +1,4 @@
 import IntroductionContainer from './IntroductionContainer';
-import MorningPulse from './MorningPulse';
 import SidebarAdvice from './Advice';
 import CreateProject from './CreateProject/CreateProject';
 import SidebarBreakTimer from './Break';
