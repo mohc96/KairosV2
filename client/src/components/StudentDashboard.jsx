@@ -8,6 +8,7 @@ import StudentProjects from './StudentProjects/StudentProjects';
 import SidebarMorningPulse from './MorningPulse';
 import SidebarAIChat from './SidebarAIChat';
 import IntegratedProjectCreator from './IntegratedProjectCreator';
+import CreateProjectAI from './CreateProject/CreateProjectAI';
 
 export default function StudentDashboard({ email }) {
   return (
@@ -21,6 +22,7 @@ export default function StudentDashboard({ email }) {
       <ExpertSearchComponent />
       <IntegratedProjectCreator />
       <AboutMe />
+      <CreateProjectAI />
       <SidebarBreakTimer />
     </div>
   );
