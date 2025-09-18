@@ -18,7 +18,7 @@ function currentUser()
 }
 
 
-  function getUserEmail() {
+  function validateUser() {
     var user_email = currentUser();
     const identity_url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/identity-fetch';
     const payload = {
@@ -35,14 +35,16 @@ function currentUser()
 
     const responseText = response.getContentText();
     const responseJson = JSON.parse(responseText);
-
+    if (response.getResponseCode()==200){
+      PropertiesService.getUserProperties().setProperty('USER_ID', responseJson.user_id)
+    }
     return {
       statusCode: response.getResponseCode(),
       email: user_email,
       role: responseJson.role
     }
   }
-  function callOpenAI(prompt) {
+  function getAdvice(prompt) {
   const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
 
   const payload = {
@@ -64,8 +66,6 @@ function currentUser()
     const response = UrlFetchApp.fetch(baseUrl, options);
     const result = JSON.parse(response.getContentText());
 
-    Logger.log("🔁 Full advice response:");
-    Logger.log(result);
 
     // ✅ Return the entire object — not just result.recommendation.advice
     return result;
@@ -91,7 +91,7 @@ function generateProject(prompt) {
     action: "createproject",
     payload: {
       message: prompt,
-      email_id: currentUser(),
+      email_id: 'mindspark.user1@schoolfuel.org',
     }
   };
 
@@ -105,11 +105,165 @@ function generateProject(prompt) {
   const response = UrlFetchApp.fetch(baseUrl, options);
   const result = JSON.parse(response.getContentText());
 
-  return JSON.stringify(result.json.project) || "No response available";
+  return JSON.stringify(result.action_response.response.project) || "No response available";
+}
+
+
+function lockProject(projectData) {
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'
+  Logger.log(projectData)
+  try {  
+    
+    // Prepare the data for the API call
+    const payload = {
+      action: "saveproject",
+      payload: {
+        json: {
+          project:projectData
+        },
+        user_id: "23e228fa-4592-4bdc-852e-192973c388ce",
+        email_id: 'mindspark.user1@schoolfuel.org',
+      },
+    };
+
+    //Logger.log(JSON.stringify(payload))
+
+    const options = {
+      method: 'POST',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    }
+    
+    // Make the API call to the backend
+    const response = UrlFetchApp.fetch(baseUrl, options);
+
+    const responseData = JSON.parse(response.getContentText());
+
+    
+    // Handle different response codes
+    return {
+      success: true,
+      message: responseData.action_response.response || 'Project successfully locked and submitted for review!',
+    }
+    
+  } catch (error) {
+    console.error('Error in lockProject function:', error);
+    
+    // Handle different types of errors
+    if (error.toString().includes('DNS error')) {
+      return {
+        success: false,
+        message: 'Network connection error. Please check your internet connection.'
+      };
+    } else if (error.toString().includes('timeout')) {
+      return {
+        success: false,
+        message: 'Request timed out. Please try again.'
+      };
+    } else {
+      return {
+        success: false,
+        message: 'An unexpected error occurred. Please contact support if the problem persists.'
+      };
+    }
+  }
+}
+
+function getStudentProjects(){
+  try {
+    const url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
+
+    const payload = {
+      action: "myprojects",
+      payload:{
+        user_id:"23e228fa-4592-4bdc-852e-192973c388ce",
+        request:"student_view_all"
+      }
+    }
+
+    const options = {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    }
+    
+    const response = UrlFetchApp.fetch(url, options);
+    
+    // Check if the HTTP request itself failed
+    if (response.getResponseCode() !== 200) {
+      throw new Error(`HTTP Error: ${response.getResponseCode()} - ${response.getContentText()}`);
+    }
+    
+    const result = JSON.parse(response.getContentText());
+    
+    // Check if the API returned an error in the response body
+    if (!result || result.status !== "success") {
+      throw new Error(`API Error: ${result?.status || 'Unknown'} - ${result?.message || 'Unknown error'}`);
+    }
+    
+    return result;
+    
+  } catch (error) {
+    console.error('Error in getStudentProjects:', error);
+    // Return an error object that your React component can handle
+    return {
+      statusCode: 500,
+      error: error.toString(),
+      body: null
+    };
+  }
+}
+
+function getProjectDetails(projectId){
+  try {
+    const url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
+
+    const payload = {
+      action: "myprojects",
+      payload:{
+        user_id:"23e228fa-4592-4bdc-852e-192973c388ce",
+        project_id:projectId,
+        request:"project_details"
+      }
+    }
+
+    const options = {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    }
+    
+    const response = UrlFetchApp.fetch(url, options);
+    
+    // Check if the HTTP request itself failed
+    if (response.getResponseCode() !== 200) {
+      throw new Error(`HTTP Error: ${response.getResponseCode()} - ${response.getContentText()}`);
+    }
+    
+    const result = JSON.parse(response.getContentText());
+    
+    // Check if the API returned an error in the response body
+    if (!result || result.status !== "success") {
+      throw new Error(`API Error: ${result?.status || 'Unknown'} - ${result?.message || 'Unknown error'}`);
+    }
+    
+    return result;
+    
+  } catch (error) {
+    console.error('Error in getStudentProjects:', error);
+    // Return an error object that your React component can handle
+    return {
+      statusCode: 500,
+      error: error.toString(),
+      body: null
+    };
+  }
 }
 
 function processDailyCheckin(userInput) {
-  console.log("this is from processDailyCheckin");
   const url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
   
   const payload = {
@@ -172,25 +326,59 @@ function getStudentProjectsForTeacher() {
   ];
 }
 
+function findExperts(message) {
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
+  const payload = {
+    action: "helpme",
+    payload: {
+      message: message,
+      geolocation: "Tucson, AZ", // You can make this dynamic
+      email_id: "student2@gmail.com" // Gets the current user's email
+    }
+  };
+  
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+  
+  try {
+    const response = UrlFetchApp.fetch(baseUrl, options);
+    const result = JSON.parse(response.getContentText());
+    Logger.log(result);
+    return result;
+  } catch (error) {
+    Logger.log('Error finding experts: ' + error.toString());
+    throw error;
+  }
+}
 
+function submitFormToScript(payload){
+  Logger.log(payload)
+}
 
+function callMorningPulseAPI(payload) {
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
 
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  try {
+    const response = UrlFetchApp.fetch(baseUrl, options);
+    const result = JSON.parse(response.getContentText());
+    Logger.log('Morning pulse API response:', result);
+    return result;
+  } catch (error) {
+    console.error('Error calling morning pulse API:', error);
+    throw error;
+  }
+}
 
 function createStudentTab(studentName, projectContent) {
   Logger.log(studentName)
@@ -361,59 +549,5 @@ function createStudentTab(studentName, projectContent) {
     console.error('=== END ERROR DETAILS ===');
     
     throw new Error(`Failed to export ${studentName}: ${error.message} (${error.name})`);
-  }
-}
-
-function findExperts(message) {
-  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
-  const payload = {
-    action: "helpme",
-    payload: {
-      message: message,
-      geolocation: "Tucson, AZ", // You can make this dynamic
-      email_id: "student2@gmail.com" // Gets the current user's email
-    }
-  };
-  
-  const options = {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-  
-  try {
-    const response = UrlFetchApp.fetch(baseUrl, options);
-    const result = JSON.parse(response.getContentText());
-    Logger.log(result);
-    return result;
-  } catch (error) {
-    Logger.log('Error finding experts: ' + error.toString());
-    throw error;
-  }
-}
-
-function submitFormToScript(payload){
-  Logger.log(payload)
-}
-
-function callMorningPulseAPI(payload) {
-  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
-
-  const options = {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-
-  try {
-    const response = UrlFetchApp.fetch(baseUrl, options);
-    const result = JSON.parse(response.getContentText());
-    Logger.log('Morning pulse API response:', result);
-    return result;
-  } catch (error) {
-    console.error('Error calling morning pulse API:', error);
-    throw error;
   }
 }

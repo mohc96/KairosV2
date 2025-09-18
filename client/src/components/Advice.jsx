@@ -30,8 +30,8 @@ export default function SidebarAdvice() {
 
     google.script.run
       .withSuccessHandler((result) => {
-        const isEmpty = !result || !result.recommendation;
-        setRecommendation(isEmpty ? null : result.recommendation);
+        const isEmpty = !result || !result.action_response;
+        setRecommendation(isEmpty ? null : result.action_response.response);
         setHasAdvice(true);
         setIsLoading(false);
       })
@@ -41,7 +41,7 @@ export default function SidebarAdvice() {
         setHasAdvice(true);
         setIsLoading(false);
       })
-      .callOpenAI(fullPrompt);
+      .getAdvice(fullPrompt);
   };
 
   const handleKeyPress = (e) => {
