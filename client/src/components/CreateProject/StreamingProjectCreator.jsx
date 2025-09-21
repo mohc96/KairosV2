@@ -97,7 +97,7 @@ export default function StreamingProjectCreator() {
           }
           return prev;
         });
-      }, 2000); // Change step every 2 seconds
+      }, 10000); // Change step every 10 seconds
     } else {
       setGenerationStep(0);
     }
@@ -186,15 +186,15 @@ export default function StreamingProjectCreator() {
         const parsedJson = JSON.parse(response);
         console.log('✅ Successfully parsed JSON response');
         console.log('📊 Project structure:', {
-          type: parsedJson.type,
-          title: parsedJson.data?.project?.project_title,
-          stages: parsedJson.data?.project?.stages?.length,
-          totalTasks: parsedJson.data?.project?.stages?.reduce((sum, stage) => sum + (stage.tasks?.length || 0), 0)
+          code: parsedJson.statusCode,
+          title: parsedJson?.body?.action_response?.response?.project?.project_title,
+          stages: parsedJson?.body?.action_response?.response?.project?.stages?.length,
+          totalTasks: parsedJson?.body?.action_response?.response?.project?.stages?.reduce((sum, stage) => sum + (stage.tasks?.length || 0), 0)
         });
 
-        if (parsedJson.type === 'return_response' && parsedJson.data?.project) {
+        if (parsedJson.statusCode === 200 && parsedJson?.body?.action_response?.response?.project) {
           // Use the same structure as REST API response
-          const projectInfo = parsedJson.data.project;
+          const projectInfo = parsedJson.body.action_response.response.project;
           setProjectData(projectInfo);
           setOriginalData(JSON.parse(JSON.stringify(projectInfo)));
           setHasProject(true);
