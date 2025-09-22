@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  FolderPlus, ChevronDown, Send, Lightbulb, Loader2, X, Edit2, Save, 
+  FolderPlus, ChevronDown, Send, Lightbulb, Loader2, X, Edit2, Save,
   Lock, Unlock, ChevronRight, Check, RotateCcw, Eye, EyeOff
 } from 'lucide-react';
 
@@ -13,7 +13,7 @@ export default function CreateProject() {
   const [hasProject, setHasProject] = useState(false);
   const [hasLockedOnce, setHasLockedOnce] = useState(false);
 
-  
+
   // New states for project editing
   const [projectData, setProjectData] = useState(null);
   const [originalData, setOriginalData] = useState(null);
@@ -39,15 +39,15 @@ export default function CreateProject() {
 
   const formatProjectForCopy = (data) => {
     if (!data) return '';
-    
+
     let formatted = `${data.project_title}\n`;
     formatted += `${data.description}\n`;
     formatted += `Subject Focus: ${data.subject_domain}\n\n`;
-    
+
     data.stages?.forEach((stage, index) => {
       formatted += `Stage ${index + 1}: ${stage.title}\n`;
       formatted += `${'='.repeat(stage.title.length + 10)}\n\n`;
-      
+
       stage.tasks?.forEach((task, taskIndex) => {
         formatted += `Task ${taskIndex + 1}: ${task.title}\n`;
         formatted += `Description: ${task.description}\n`;
@@ -57,7 +57,7 @@ export default function CreateProject() {
         }
         formatted += '\n';
       });
-      
+
       formatted += `✅ Gate: ${stage.gate.title}\n`;
       formatted += `${stage.gate.description}\n`;
       formatted += 'Checklist:\n';
@@ -66,7 +66,7 @@ export default function CreateProject() {
       });
       formatted += '\n';
     });
-    
+
     return formatted;
   };
 
@@ -91,17 +91,17 @@ export default function CreateProject() {
   }, [projectData, originalData]);
 
   useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (showSubjectDropdown && !event.target.closest('.relative')) {
-      setShowSubjectDropdown(false);
-    }
-  };
+    const handleClickOutside = (event) => {
+      if (showSubjectDropdown && !event.target.closest('.relative')) {
+        setShowSubjectDropdown(false);
+      }
+    };
 
-  document.addEventListener('mousedown', handleClickOutside);
-  return () => {
-    document.removeEventListener('mousedown', handleClickOutside);
-  };
-}, [showSubjectDropdown]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSubjectDropdown]);
 
   const handleSubmit = async () => {
     if (!userInput.trim()) return;
@@ -125,13 +125,13 @@ export default function CreateProject() {
             .withSuccessHandler(resolve)
             .withFailureHandler(reject)
             .generateProject(promptWithSubject);
-        } 
+        }
       });
 
       // Parse the result
       let parsedData;
       let textOutput;
-      
+
       try {
         parsedData = JSON.parse(result);
         textOutput = `Subject: ${selectedSubject}\nGenerated project for: ${userInput}\n\nProject includes ${parsedData.stages?.length || 0} stages with structured tasks and gates.`;
@@ -146,7 +146,7 @@ export default function CreateProject() {
 
       setProjectOutput(textOutput);
       setHasProject(true);
-      
+
     } catch (error) {
       console.error('Error calling generateProject:', error);
       setProjectOutput("I'm currently unable to connect to the project service. Please try again later.");
@@ -189,16 +189,16 @@ export default function CreateProject() {
 
     setProjectData(prev => ({
       ...prev,
-      stages: prev.stages.map(stage => 
-        stage.stage_id === stageId 
+      stages: prev.stages.map(stage =>
+        stage.stage_id === stageId
           ? {
-              ...stage,
-              tasks: stage.tasks.map(task => 
-                task.task_id === taskId 
-                  ? { ...task, [field]: value }
-                  : task
-              )
-            }
+            ...stage,
+            tasks: stage.tasks.map(task =>
+              task.task_id === taskId
+                ? { ...task, [field]: value }
+                : task
+            )
+          }
           : stage
       )
     }));
@@ -209,8 +209,8 @@ export default function CreateProject() {
 
     setProjectData(prev => ({
       ...prev,
-      stages: prev.stages.map(stage => 
-        stage.stage_id === stageId 
+      stages: prev.stages.map(stage =>
+        stage.stage_id === stageId
           ? { ...stage, title: newTitle }
           : stage
       )
@@ -222,8 +222,8 @@ export default function CreateProject() {
 
     setProjectData(prev => ({
       ...prev,
-      stages: prev.stages.map(stage => 
-        stage.stage_id === stageId 
+      stages: prev.stages.map(stage =>
+        stage.stage_id === stageId
           ? { ...stage, gate: { ...stage.gate, [field]: value } }
           : stage
       )
@@ -242,23 +242,23 @@ export default function CreateProject() {
   const lockProject = () => {
     if (hasLockedOnce) return; // Already locked, don’t allow again
 
-  const confirmed = window.confirm(
-    "Are you sure you want to lock and submit this project for teacher review?\n\n⚠️ You won’t be able to make any further edits."
-  );
+    const confirmed = window.confirm(
+      "Are you sure you want to lock and submit this project for teacher review?\n\n⚠️ You won’t be able to make any further edits."
+    );
 
-  if (!confirmed) return;
+    if (!confirmed) return;
 
-  setIsLocked(true);
-  setHasLockedOnce(true);
-  setEditingItem(null);
-  console.log('✅ Project locked and submitted:', projectData);
+    setIsLocked(true);
+    setHasLockedOnce(true);
+    setEditingItem(null);
+    console.log('✅ Project locked and submitted:', projectData);
   };
 
   const unlockProject = () => {
     if (hasLockedOnce) {
-    alert("You can't unlock this project after submitting it for review.");
-    return;
-  }
+      alert("You can't unlock this project after submitting it for review.");
+      return;
+    }
     setIsLocked(false);
   };
 
@@ -294,11 +294,11 @@ export default function CreateProject() {
   };
 
   // Improved Inline Editable Field Component
-    // Improved Inline Editable Field Component
-  const InlineEditableField = ({ 
-    value, 
-    onSave, 
-    multiline = false, 
+  // Improved Inline Editable Field Component
+  const InlineEditableField = ({
+    value,
+    onSave,
+    multiline = false,
     placeholder = "",
     className = "",
     displayClassName = "",
@@ -382,8 +382,8 @@ export default function CreateProject() {
     }
 
     return (
-      <div 
-        className={`group flex items-start gap-1 ${isReadOnly ? 'cursor-default opacity-70' : 'cursor-pointer'}`} 
+      <div
+        className={`group flex items-start gap-1 ${isReadOnly ? 'cursor-default opacity-70' : 'cursor-pointer'}`}
         onClick={handleStart}
       >
         <div className={`flex-1 ${displayClassName}`}>
@@ -407,8 +407,8 @@ export default function CreateProject() {
     <div className="w-full max-w-[300px] font-sans">
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm w-full overflow-hidden transition-all duration-200">
         {/* Toggle Button */}
-        <div 
-          onClick={toggleExpanded} 
+        <div
+          onClick={toggleExpanded}
           className="w-full p-3 cursor-pointer transition-colors duration-200 hover:bg-gray-50"
         >
           <div className="flex justify-between items-center">
@@ -466,11 +466,10 @@ export default function CreateProject() {
                       )}
                       <button
                         onClick={isLocked ? unlockProject : lockProject}
-                        className={`px-2 py-1 text-xs rounded transition-colors ${
-                          isLocked 
-                            ? 'bg-red-100 hover:bg-red-200 text-red-700' 
-                            : 'bg-green-100 hover:bg-green-200 text-green-700'
-                        }`}
+                        className={`px-2 py-1 text-xs rounded transition-colors ${isLocked
+                          ? 'bg-red-100 hover:bg-red-200 text-red-700'
+                          : 'bg-green-100 hover:bg-green-200 text-green-700'
+                          }`}
                         title={isLocked ? 'Unlock Project' : 'Lock & Submit'}
                       >
                         {isLocked ? <Unlock size={12} /> : <Lock size={12} />}
@@ -522,7 +521,7 @@ export default function CreateProject() {
                                     <ChevronRight size={12} />
                                   )}
                                 </button>
-                                
+
                                 <div className="flex-1 min-w-0">
                                   <InlineEditableField
                                     value={stage.title}
@@ -560,12 +559,12 @@ export default function CreateProject() {
                                     <div className="text-gray-500 text-xs">
                                       Standard: {task.academic_standard}
                                     </div>
-                                    
+
                                     {task.resource_id && (
                                       <div className="text-xs">
-                                        <a 
-                                          href={task.resource_id.url} 
-                                          target="_blank" 
+                                        <a
+                                          href={task.resource_id.url}
+                                          target="_blank"
                                           rel="noopener noreferrer"
                                           className="text-blue-600 hover:text-blue-800 underline"
                                         >
@@ -584,7 +583,7 @@ export default function CreateProject() {
                                     placeholder="Gate title"
                                     displayClassName="font-medium"
                                   />
-                                  
+
                                   <InlineEditableField
                                     value={stage.gate.description}
                                     onSave={(value) => updateGateField(stage.stage_id, 'description', value)}
@@ -592,7 +591,7 @@ export default function CreateProject() {
                                     multiline={true}
                                     displayClassName="text-gray-600 text-xs"
                                   />
-                                  
+
                                   <div className="space-y-1">
                                     {stage.gate.checklist?.map((item, index) => (
                                       <div key={index} className="flex items-center gap-2">
@@ -611,14 +610,14 @@ export default function CreateProject() {
                   </div>
 
                   <div className="border-t border-purple-200 p-2">
-                    <button 
-                    onClick={() => navigator.clipboard.writeText(
-                      view === 'text' ? projectOutput : formatProjectForCopy(projectData)
-                    )}
-                    className="text-xs text-purple-600 hover:bg-purple-100 transition-colors px-1 py-0.5 rounded"
-                  >
-                    📋 Copy project
-                  </button>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(
+                        view === 'text' ? projectOutput : formatProjectForCopy(projectData)
+                      )}
+                      className="text-xs text-purple-600 hover:bg-purple-100 transition-colors px-1 py-0.5 rounded"
+                    >
+                      📋 Copy project
+                    </button>
                   </div>
                 </div>
               )}
@@ -692,22 +691,21 @@ export default function CreateProject() {
                   <button
                     type="button"
                     onClick={() => setShowSubjectDropdown(!showSubjectDropdown)}
-                    className={`w-full px-3 py-2 text-sm text-left border rounded-lg bg-white hover:bg-gray-50 focus:ring-2 focus:ring-purple-500 outline-none flex items-center justify-between ${
-                      subjectError 
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500' 
-                        : 'border-gray-300 focus:border-purple-500'
-                    }`}
+                    className={`w-full px-3 py-2 text-sm text-left border rounded-lg bg-white hover:bg-gray-50 focus:ring-2 focus:ring-purple-500 outline-none flex items-center justify-between ${subjectError
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                      : 'border-gray-300 focus:border-purple-500'
+                      }`}
                   >
                     <span className={selectedSubject ? 'text-gray-900' : 'text-gray-500'}>
                       {selectedSubject ? subjects.find(s => s.value === selectedSubject)?.label : 'Select Subject'}
                     </span>
                     <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showSubjectDropdown ? 'rotate-180' : ''}`} />
                   </button>
-                  
+
                   {subjectError && (
                     <p className="mt-1 text-xs text-red-600">Please select a subject</p>
                   )}
-                  
+
                   {showSubjectDropdown && (
                     <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                       <div className="py-1">
@@ -720,9 +718,8 @@ export default function CreateProject() {
                               setShowSubjectDropdown(false);
                               setSubjectError(false); // Clear error when subject is selected
                             }}
-                            className={`w-full px-3 py-2 text-sm text-left hover:bg-gray-100 transition-colors ${
-                              selectedSubject === subject.value ? 'bg-purple-50 text-purple-700' : 'text-gray-700'
-                            }`}
+                            className={`w-full px-3 py-2 text-sm text-left hover:bg-gray-100 transition-colors ${selectedSubject === subject.value ? 'bg-purple-50 text-purple-700' : 'text-gray-700'
+                              }`}
                           >
                             {subject.label}
                           </button>
