@@ -234,11 +234,13 @@ export const DashboardView = ({
             />
           )}
           
-          {/* Show Acknowledgments section if there are any acknowledgments */}
-          <AcknowledgmentsSection
-            acknowledgments={acknowledgments}
-            onClear={onClearAcknowledgments}
-          />
+          {/* Show Acknowledgments section only when Peer Updates is selected and there are acknowledgments */}
+          {selectedSectionKey === 'Peers' && acknowledgments.length > 0 && (
+            <AcknowledgmentsSection
+              acknowledgments={acknowledgments}
+              onClear={onClearAcknowledgments}
+            />
+          )}
         </>
       ) : (
         <p>No section selected</p>
