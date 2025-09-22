@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  FolderOpen, ChevronDown, ChevronRight, BookOpen, 
-  Clock, Search, Filter
+  FolderOpen, ChevronDown, BookOpen, 
+  Clock, Search, Filter, RotateCcw
 } from 'lucide-react';
 import ProjectDetail from './ProjectDetail';
 
@@ -13,16 +13,9 @@ export default function StudentProjects() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [forceReload, setForceReload] = useState(0); // Add this to force reload
 
-  const fetchProjects=()=>{
-    setProjects([]);
-    setError(null);
-  }
-
-
-// Load projects when component expands
- useEffect(() => {
-  if (isExpanded && projects.length === 0 && !error) {
+  const fetchProjects = () => {
     setIsLoading(true);
     setError(null);
     
@@ -50,9 +43,30 @@ export default function StudentProjects() {
         setIsLoading(false);
       })
       .getStudentProjects();
-  }
-}, [isExpanded, projects.length, error]);
+  };
 
+  const reloadProjects = () => {
+    // Clear current data
+    setProjects([]);
+    setError(null);
+    setSearchTerm(''); // Clear search
+    setSelectedSubject(''); // Clear filter
+    
+    // Force a reload by incrementing the counter
+    setForceReload(prev => prev + 1);
+    
+    // If component is not expanded, expand it
+    if (!isExpanded) {
+      setIsExpanded(true);
+    }
+  };
+
+  // Load projects when component expands OR when forceReload changes
+  useEffect(() => {
+    if (isExpanded && (projects.length === 0 || forceReload > 0) && !isLoading) {
+      fetchProjects();
+    }
+  }, [isExpanded, forceReload]); // Remove projects.length and error dependencies
 
   // Get unique subjects for filtering
   const subjects = [...new Set(projects.map(p => p.subject_domain))];
@@ -122,6 +136,7 @@ export default function StudentProjects() {
   const handleBackToList = () => {
     setSelectedProjectId(null);
   };
+
   if (selectedProjectId) {
     return <ProjectDetail projectId={selectedProjectId} onBack={handleBackToList} />;
   }
@@ -188,6 +203,24 @@ export default function StudentProjects() {
                   )}
                 </div>
               )}
+
+              {/* Reload Project Button - Improved */}
+              <div className="mb-3">
+                <button 
+                  onClick={reloadProjects}
+                  disabled={isLoading}
+                  className={`
+                    flex items-center gap-2 text-xs px-3 py-2 rounded transition-all duration-200
+                    ${isLoading 
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                      : 'bg-blue-100 text-blue-700 hover:bg-blue-200 active:scale-95'
+                    }
+                  `}
+                >
+                  <RotateCcw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
+                  {isLoading ? 'Reloading...' : 'Reload Projects'}
+                </button>
+              </div>
 
               {/* Loading State */}
               {isLoading && (
@@ -267,21 +300,6 @@ export default function StudentProjects() {
                       </div>
                     </div>
                   ))}
-                </div>
-              )}
-
-              {/* Retry Button for Error State */}
-              {!isLoading && error && (
-                <div className="text-center mt-3">
-                  <button 
-                    onClick={() => {
-                      setError(null);
-                      fetchProjects();
-                    }}
-                    className="text-xs px-3 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors"
-                  >
-                    Retry Loading
-                  </button>
                 </div>
               )}
 

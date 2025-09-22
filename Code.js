@@ -84,31 +84,6 @@ function currentUser()
   }
 }
 
-function generateProject(prompt) {
-  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'; // Lambda URL
-
-  const payload = {
-    action: "createproject",
-    payload: {
-      message: prompt,
-      email_id: 'mindspark.user1@schoolfuel.org',
-    }
-  };
-
-  const options = {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-
-  const response = UrlFetchApp.fetch(baseUrl, options);
-  const result = JSON.parse(response.getContentText());
-
-  return JSON.stringify(result.action_response.response.project) || "No response available";
-}
-
-
 function lockProject(projectData) {
   const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'
   Logger.log(projectData)
