@@ -25,22 +25,46 @@ const DEFAULT_EMOJIS = [
 ];
 
 const DEFAULT_DASHBOARD_DATA = {
+  "ValueMessage": [
+    
+  ],
+  "Peers": {
+    "Diego Lopez": [
+      "completed a major project assessment!",
+      "is working on climate change research",
+      "shared insights about sustainable practices"
+    ],
+    "Aiden Smith": [
+      "is working on a task similar to yours",
+      "completed the weekly assignment",
+      "is looking for study partners"
+    ],
+    "Fatima Patel": [
+      "is looking for experts in the area of climate change",
+      "published a new research paper",
+      "is organizing a climate awareness event"
+    ],
+    "Liam O'Connor": [
+      "just started a new project",
+      "is seeking feedback on his latest work",
+      "completed the group presentation"
+    ],
+    "Sofia Martinez": [
+      "is looking to put together a reading group",
+      "shared interesting articles about sustainability",
+      "is organizing a community cleanup event"
+    ],
+    "Jin Yamamoto": [
+      "is new to your class group",
+      "introduced himself in the discussion forum",
+      "is eager to collaborate on projects"
+    ]
+  },
   "ActiveProjects": [
     "Climate Change in Arcadia, AZ",
     "Displacement of People Impacted by Climate Disasters",
     "Urban Heat Islands"
-  ],
-  "Peers": [
-    "Diego Lopez completed a major project assessment!",
-    "Aiden Smith is working on a task similar to yours.",
-    "Fatima Patel is looking for experts in the area of climate change.",
-    "Liam O'Connor just started a new project.",
-    "Sofia Martinez is looking to put together a reading group.",
-    "Jin Yamamoto is new to your class group."
-  ],
-  "ValueMessage": [
-    "Great work yesterday! You accomplished a lot. This certainly will lead you to an amazing project outcome. Continue to focus on being self-aware of anything that may get in your way. You are on your way to becoming your \"best self\"."
-  ]
+  ]  
 };
 
 export default function SidebarMorningPulse({
@@ -53,7 +77,7 @@ export default function SidebarMorningPulse({
   userEmail = 'user@example.com',
   
   // Text customization props
-  pulseHeaderTitle = "🌿 Breathe In, Begin Now 🚀",
+  pulseHeaderTitle = "Breathe In, Begin Now",
   emojiSelectorTitle = "How are you feeling today?",
   textInputTitle = "What's your energy focused on today?",
   textInputPlaceholder = "Today I'm feeling... / My energy is directed toward... / I'm focusing on...",
@@ -101,7 +125,12 @@ export default function SidebarMorningPulse({
     resetForm
   } = state;
 
-  const [motivation, setMotivation] = React.useState("");  
+  const [motivation, setMotivation] = React.useState(""); 
+  const [updatedDashboardData, setUpdatedDashboardData] = React.useState(dashboardData);
+  const [reactions, setReactions] = React.useState({}); // Store reactions: {peerName: {messageIndex: {emoji: '😊', user: 'currentUser'}}}
+  const [acknowledgments, setAcknowledgments] = React.useState([]); // Store acknowledgment history
+   
+
   // Auto-expand functionality
   React.useEffect(() => {
     if (autoExpand && !isExpanded) {
@@ -110,6 +139,10 @@ export default function SidebarMorningPulse({
   }, [autoExpand, isExpanded, setIsExpanded]);
 
   const toggleExpanded = () => setIsExpanded(!isExpanded);
+
+  React.useEffect(() => {
+    console.log('Dashboard data updated:', updatedDashboardData);
+  }, [updatedDashboardData]);
 
 const handlePulseSubmit = () => {
   // Validation check
@@ -127,7 +160,13 @@ const handlePulseSubmit = () => {
       google.script.run
         .withSuccessHandler((motivationText) => {
           // Set the motivation message
-          setMotivation(motivationText || "Stay motivated and keep going!");
+          //setMotivation(motivationText || "Stay motivated and keep going!");
+          console.log('Received inspiration text:', motivationText);
+          const newDashboardData = {
+            ...updatedDashboardData,
+            ValueMessage: [motivationText || "Stay motivated and keep going!"]
+          };
+          setUpdatedDashboardData(newDashboardData);
           
           // Update state to show dashboard
           setIsLoadingPulse(false);
@@ -143,7 +182,44 @@ const handlePulseSubmit = () => {
 
   const handleReset = () => {
     resetForm();
-    setMotivation("");
+    //setMotivation("");
+    setUpdatedDashboardData(dashboardData);
+    setReactions({});
+    setAcknowledgments([]);
+  };
+
+  // Handle reaction to peer updates
+  const handleReaction = (peerName, messageIndex, emoji, messageContent) => {
+    const newReaction = {
+      peerName,
+      messageIndex,
+      emoji,
+      user: userEmail,
+      messageContent,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Update reactions state (replace existing reaction if any)
+    setReactions(prev => ({
+      ...prev,
+      [peerName]: {
+        ...prev[peerName],
+        [messageIndex]: newReaction
+      }
+    }));
+    
+    // Update acknowledgments (replace existing reaction if any)
+    setAcknowledgments(prev => {
+      const filtered = prev.filter(ack => 
+        !(ack.peerName === peerName && ack.messageIndex === messageIndex)
+      );
+      return [...filtered, newReaction];
+    });
+  };
+
+  // Clear acknowledgments
+  const clearAcknowledgments = () => {
+    setAcknowledgments([]);
   };
 
   const getStatusIcon = () => {
@@ -178,7 +254,7 @@ const StatusIconWithDot = () => (
     <div className="relative inline-flex">
       <StatusIcon className={`h-5 w-5 ${getIconColor()}`} />
       <span
-        className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ring-2 ring-white ${getStatusDot()}`}
+        className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${getStatusDot()}`}
       />
     </div>
   );
@@ -216,13 +292,13 @@ const StatusIconWithDot = () => (
 
           {currentStep === 'dashboard' && (
             <>
-            {motivation && (
+            {/* {motivation && (
                 <div className="mb-4 p-3 bg-emerald-100 text-emerald-800 rounded-lg text-center font-semibold">
                   {motivation}
                 </div>
-              )}
+              )} */}
             <DashboardView
-              dashboardData={dashboardData}
+              dashboardData={updatedDashboardData}
               onReset={showResetButton ? handleReset : null}
               welcomeTitle={dashboardWelcomeTitle}
               welcomeSubtitle={dashboardWelcomeSubtitle}
@@ -230,6 +306,11 @@ const StatusIconWithDot = () => (
               sectionsConfig={sectionsConfig}
               showResetButton={showResetButton}
               responseMessage={state.responseMessage}
+              reactions={reactions}
+              acknowledgments={acknowledgments}
+              onReaction={handleReaction}
+              onClearAcknowledgments={clearAcknowledgments}
+              userEmail={userEmail}
             />
             </>
 
