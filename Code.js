@@ -268,11 +268,7 @@ function processDailyCheckin(userInput) {
       console.log("status 200 received")
     
     // Return the project data or fallback message
-<<<<<<< HEAD
-    return JSON.parse(JSON.stringify(result?.action_response?.response)) || "No response available";
-=======
     return JSON.parse(JSON.stringify(result?.action_response?.motivation)) || "No response available";
->>>>>>> 70c288111c7393cadc3dfb759cd52b8dba7ae217
   } catch (error) {
     console.error('Error processing daily check-in:', error.toString());
     
