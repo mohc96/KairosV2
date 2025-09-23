@@ -284,6 +284,130 @@ function processDailyCheckin(userInput) {
   }
 }
 
+function callAIServiceInitiation(userInput) {
+  console.log("this is from callAIServiceInitiation");
+  const url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
+  
+  const payload = {
+    action: "guideme",
+    payload: {
+      email_id: Session.getActiveUser().getEmail(),
+      message: userInput.message,
+      context: {
+        mode: userInput.context.mode,
+        focus: userInput.context.focus,
+        course: userInput.context.course,
+        grade: userInput.context.grade,
+        readingLevel: userInput.context.readingLevel,
+        standards: userInput.context.standards,
+        pastedContent: userInput.context.pastedContent
+      }
+    }
+  }; 
+  
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+  
+  try {
+    const response = UrlFetchApp.fetch(url, options);
+    console.log('API Response Status from GuideMe Initiation:', response.getResponseCode());
+    
+    const result = JSON.parse(response.getContentText());
+    console.log('API Response Initiation:', result);
+    
+    if (result.statusCode == 200) {
+      console.log("status 200 received");
+    }
+    
+    // Check if the response has the expected structure
+    if (result.status === "success" && result.action_response) {
+      // Return the properly structured response that matches what your frontend expects
+      return {
+        message: result.action_response.response,
+        conversation_id: result.action_response.conversation_id,
+        generatedAt: result.action_response.generatedAt,
+        citations: [] // Add empty citations array if not provided by backend
+      };
+    } else {
+      // Return error structure
+      return {
+        error: "Invalid response structure",
+        message: "No response available"
+      };
+    }
+    
+  } catch (error) {
+    console.error('Error processing AI initiation request:', error.toString());
+    // Return error structure that frontend can handle
+    return {
+      error: error.toString(),
+      message: "Error connecting to AI service"
+    };
+  }
+}
+
+function callAIServiceContinue(userInput) {
+  console.log("this is from callAIServiceContinue");
+  const url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
+  
+  const payload = {
+    action: "guideme",
+    payload: {
+      email_id: Session.getActiveUser().getEmail(),
+      message: userInput.message,
+      conversation_id: userInput.conversation_id
+    }
+  }; 
+  
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+  
+  try {
+    const response = UrlFetchApp.fetch(url, options);
+    console.log('API Response Status from GuideMe Continue:', response.getResponseCode());
+    
+    const result = JSON.parse(response.getContentText());
+    console.log('API Response Continue:', result);
+    
+    if (result.statusCode == 200) {
+      console.log("status 200 received");
+    }
+    
+    // Check if the response has the expected structure
+    if (result.status === "success" && result.action_response) {
+      // Return the properly structured response that matches what your frontend expects
+      return {
+        message: result.action_response.response,
+        conversation_id: result.action_response.conversation_id,
+        generatedAt: result.action_response.generatedAt,
+        citations: [] // Add empty citations array if not provided by backend
+      };
+    } else {
+      // Return error structure
+      return {
+        error: "Invalid response structure",
+        message: "No response available"
+      };
+    }
+    
+  } catch (error) {
+    console.error('Error processing AI continue request:', error.toString());
+    // Return error structure that frontend can handle
+    return {
+      error: error.toString(),
+      message: "Error connecting to AI service"
+    };
+  }
+}
+
 function getStudentProjectsForTeacher() {
   return [
     {
