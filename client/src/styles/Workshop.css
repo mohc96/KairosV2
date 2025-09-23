@@ -230,3 +230,15 @@
   margin-right: 0.5rem;
   animation: spin 0.8s linear infinite;
 }
+
+.results-box::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+.results-box::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 9999px;
+}
+.results-box::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}

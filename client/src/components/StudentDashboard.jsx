@@ -6,6 +6,7 @@ import ExpertSearchComponent from './WhoCanHelp';
 import StudentProjects from './StudentProjects/StudentProjects';
 import SidebarMorningPulse from './MorningPulse';
 import CreateProject from './CreateProject/CreateProject';
+import SidebarWorkshop from './workshopbuilder';
 
 export default function StudentDashboard({ email }) {
   return (
@@ -14,6 +15,7 @@ export default function StudentDashboard({ email }) {
       <SidebarMorningPulse />
       <CreateProject/>
       <StudentProjects />
+      <SidebarWorkshop /> 
       <SidebarAdvice />
       <ExpertSearchComponent />
       <AboutMe />
