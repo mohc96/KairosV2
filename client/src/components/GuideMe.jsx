@@ -1,4 +1,4 @@
-
+import React, { useState, useEffect } from 'react';
 import {
     Clock,
     Download,
@@ -6,11 +6,8 @@ import {
     ThumbsUp,
     ThumbsDown,
     Send,
-    User,
-    GraduationCap,
     ChevronDown,
     ChevronUp,
-    MessageCircle,
     Bot,
     BotMessageSquare,
     Bug
