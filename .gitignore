@@ -1,3 +1,4 @@
 node_modules
 .clasp.json
-Sidebar.html.DS_Store
+Sidebar.html
+.DS_Store
