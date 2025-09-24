@@ -7,6 +7,7 @@ import GuideMe from './GuideMe';
 import StudentProjects from './StudentProjects/StudentProjects';
 import SidebarMorningPulse from './MorningPulse';
 import CreateProject from './CreateProject/CreateProject';
+import GuideMe from './GuideMe';
 import SidebarWorkshop from './WorkshopBuilder';
 
 export default function StudentDashboard({ email }) {
