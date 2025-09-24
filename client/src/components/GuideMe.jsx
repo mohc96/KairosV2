@@ -169,6 +169,8 @@ export default function ExpandableGuideMe({
     const resetTimer = () => {
         setTimeLeft(20 * 60);
         setIsRunning(false);
+        setIsLoading(false);
+        setHasMessage(false);
     };
 
     const handleSendMessage = () => {
@@ -438,6 +440,17 @@ export default function ExpandableGuideMe({
         setSavedFocus('');
         setIsWaitingForResponse(false); // Reset waiting state
         resetTimer();
+        setContext({
+            course: '',
+            grade: '',
+            readingLevel: '',
+            standards: [],
+            pastedContent: ''
+        });
+        // reset the status dot
+        setIsLoading(false);
+        setHasMessage(false);
+        setConversationId(null);
     };
 
     const handleReportBug = () => {
@@ -446,10 +459,6 @@ export default function ExpandableGuideMe({
 
     const handleSubmitBugReport = () => {
         if (bugReportText.trim()) {
-            // Save/report the bug: you can POST to an endpoint, save to state, or send to email here.
-            // Example: console.log('Bug report:', bugReportText);
-
-            // Reset form & feedback to user
             setBugReportText('');
             setShowBugReport(false);
             alert('Thank you for your bug report!');
@@ -461,18 +470,18 @@ export default function ExpandableGuideMe({
             {/* Header - Always Visible - Optimized for narrow sidebar */}
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full px-3 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition-colors bg-gradient-to-r from-blue-100 to-purple-100"
+                className="w-full px-3 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition-colors bg-white"
             >
-                <div className="flex items-center space-x-2 min-w-0">
-                    <div className="flex items-center justify-center w-7 h-7 rounded-full flex-shrink-0">
-                        <div className="relative inline-flex">
-                            <Bot className="w-5 h-5 text-blue-600" />
+                <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3 ">
+                        <div className="relative">
+                            <Bot className="w-5 h-5 text-gray-600" />
                             <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${getStatusDot()}`}></div>
                         </div>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                        <h3 className="font-medium text-gray-900 ">Guide Me</h3>
-                        <p className="text-sm text-gray-500">{getSessionStatus()}</p>
+                        <div>
+                            <h3 className="font-medium text-gray-900 text-base ">Guide Me</h3>
+                            <p className="text-sm text-gray-500">{getSessionStatus()}</p>
+                        </div>
                     </div>
                 </div>
                 <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
@@ -483,11 +492,6 @@ export default function ExpandableGuideMe({
                         </div>
                     )}
                     <div className={`transform transition-transform duration-200 `}>
-                        {/* {isExpanded ? (
-                            <ChevronUp className="w-5 h-5 text-gray-400 transition-transform duration-200" />
-                        ) : (
-                            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 `} />
-                        )} */}
                         <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                     </div>
                 </div>
@@ -588,11 +592,6 @@ export default function ExpandableGuideMe({
                             <div className="flex-1 overflow-y-auto p-2 space-y-2">
                                 {messages.length === 0 && !isWaitingForResponse ? (
                                     <div className="text-center text-gray-500 py-6 text-xs">
-                                        <BotMessageSquare className="w-6 h-6 text-gray-300 mx-auto mb-2" />
-                                        <p className="mb-1">Start your session</p>
-                                        <p className="text-xs">
-                                            <span className="font-medium">{mode}</span> | <span className="font-medium">{focus}</span>
-                                        </p>
                                     </div>
                                 ) : (
                                     <>
@@ -671,23 +670,29 @@ export default function ExpandableGuideMe({
 
                             {/* Input Area - Compact for sidebar */}
                             <div className="border-t border-gray-200 p-2">
-                                <div className="flex space-x-1">
-                                    <input
-                                        type="text"
+                                <div className="flex space-x-1 items-end"> {/* Added items-end */}
+                                    <textarea
                                         value={inputMessage}
                                         onChange={(e) => setInputMessage(e.target.value)}
-                                        onKeyPress={(e) => e.key === 'Enter' && !isWaitingForResponse && handleSendMessage()}
+                                        rows={3}
                                         placeholder={isWaitingForResponse ? "Waiting for response..." : "Ask me anything..."}
                                         disabled={isWaitingForResponse}
-                                        className={`flex-1 px-2 py-1.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent ${isWaitingForResponse ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+                                        className="flex-1 px-3 py-3 border border-gray-300 rounded-lg text-xs resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && !e.shiftKey && !isWaitingForResponse) {
+                                                e.preventDefault();
+                                                handleSendMessage();
+                                            }
+                                        }}
                                     />
+
                                     <button
                                         onClick={handleSendMessage}
                                         disabled={isWaitingForResponse}
-                                        className={`px-2 py-1.5 rounded-lg transition-colors flex-shrink-0 ${isWaitingForResponse
+                                        className={`px-2 py-2 h-8 rounded-lg transition-colors flex-shrink-0 ${isWaitingForResponse
                                             ? 'bg-gray-400 cursor-not-allowed'
                                             : 'bg-blue-600 hover:bg-blue-700'
-                                            } text-white`}
+                                            } text-white flex items-center justify-center`}
                                     >
                                         <Send className="w-3 h-3" />
                                     </button>
@@ -814,8 +819,6 @@ function ContextSection({
                             />
                         </div>
                     </div>
-
-                    Standards
                     <div>
                         <label className="block text-xs font-medium text-gray-600 mb-1">Standards</label>
                         <div className="flex space-x-1">
