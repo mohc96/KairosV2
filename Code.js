@@ -12,10 +12,14 @@ function onOpen() {
     DocumentApp.getUi().showSidebar(html);
   }
 
-function currentUser()
-{
-  return Session.getActiveUser().getEmail();
-}
+  function currentUser()
+  {
+    return Session.getActiveUser().getEmail();
+  }
+
+  function getLearningStandards(){
+    return PropertiesService.getUserProperties('LEARNING_STANDARDS')
+  }
 
 
   function validateUser() {
