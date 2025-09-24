@@ -117,7 +117,7 @@ export default function SidebarAdvice() {
                 <div className={`status-dot ${getStatusDot()}`}></div>
               </div>
               <div>
-                <div className="title">Get Advice</div>
+                <div className="font-medium text-gray-900">Get Advice</div>
                 <div
                   className="subtitle"
                   style={{ color: getStatusTextColor() }}

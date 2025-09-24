@@ -24,10 +24,9 @@ function onOpen() {
 
   function validateUser() {
     var user_email = currentUser();
-    const identity_url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/dev/identity-fetch';
+    const identity_url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/identity-fetch';
     const payload = {
       email_id: user_email,
-      request_file: "Learning_Standards.json"
     };
     const options = {
       method: 'post',
@@ -42,7 +41,6 @@ function onOpen() {
     const responseJson = JSON.parse(responseText);
     if (response.getResponseCode()==200){
       PropertiesService.getUserProperties().setProperty('USER_ID', responseJson.user_id)
-      PropertiesService.getUserProperties().setProperty('LEARNING_STANDARDS', responseJson.url)
     }
     return {
       statusCode: response.getResponseCode(),
