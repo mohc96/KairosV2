@@ -65,9 +65,14 @@
 .icon { width: 1.5rem; height: 1.5rem; }
 
 .status-dot {
-  position: absolute; top: -0.25rem; right: -0.25rem;
-  width: 0.75rem; height: 0.75rem; border-radius: 9999px;
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
 }
+
 .dot-green { background-color: #22c55e; }
 .dot-blue  { background-color: #3b82f6; }
 .dot-gray  { background-color: #9ca3af; }
