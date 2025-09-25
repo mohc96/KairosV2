@@ -70,8 +70,6 @@ function onOpen() {
     const response = UrlFetchApp.fetch(baseUrl, options);
     const result = JSON.parse(response.getContentText());
 
-
-    // ✅ Return the entire object — not just result.recommendation.advice
     return result;
   } catch (error) {
     Logger.log("❌ Error fetching from OpenAI Lambda:");
