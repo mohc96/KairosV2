@@ -65,9 +65,14 @@
 .icon { width: 1.5rem; height: 1.5rem; }
 
 .status-dot {
-  position: absolute; top: -0.25rem; right: -0.25rem;
-  width: 0.75rem; height: 0.75rem; border-radius: 9999px;
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
 }
+
 .dot-green { background-color: #22c55e; }
 .dot-blue  { background-color: #3b82f6; }
 .dot-gray  { background-color: #9ca3af; }
@@ -241,4 +246,49 @@
 }
 .results-box::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+
+/* Step 6 results styling */
+.results-box {
+  font-family: sans-serif;
+  font-size: 0.85rem;       /* smaller text like preview */
+  line-height: 1.4;
+  color: #374151;           /* slate-700 */
+}
+
+.results-box h5 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.25rem;
+  color: #1d4ed8;           /* blue headings like preview */
+}
+
+.results-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.results-box li {
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;  /* shorten long file names */
+  white-space: nowrap;
+}
+
+.results-box a {
+  color: #4f46e5;           /* indigo links */
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.results-box a:hover {
+  text-decoration: underline;
+}
+
+.results-box p {
+  margin: 0 0 6px;
+  font-size: 0.85rem;
 }

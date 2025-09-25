@@ -6,7 +6,7 @@ import ExpertSearchComponent from './WhoCanHelp';
 import StudentProjects from './StudentProjects/StudentProjects';
 import SidebarMorningPulse from './MorningPulse';
 import CreateProject from './CreateProject/CreateProject';
-import SidebarWorkshop from './workshopbuilder';
+import SidebarWorkshop from './WorkshopBuilder';
 
 export default function StudentDashboard({ email }) {
   return (

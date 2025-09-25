@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   ClipboardList,
   ChevronDown,
@@ -13,8 +13,12 @@ import Select from "react-select";
 const STEPS = ["Topic", "Standards", "Group", "Artifacts", "Review", "Results"];
 
 export default function SidebarWorkshop() {
+
+  
   const [isExpanded, setIsExpanded] = useState(false);
   const [step, setStep] = useState(0);
+  const [copySuccess, setCopySuccess] = useState("");
+
 
   const [procStatus, setProcStatus] = useState("idle");
 
@@ -35,6 +39,28 @@ export default function SidebarWorkshop() {
     artifacts: [],
     resources: [], 
   });
+
+ const formatWorkshopForCopy = useCallback((processed, data) => {
+    if (!processed?.body?.action_response) return "";
+
+    const { artifacts } = processed.body.action_response;
+
+    let formatted = `📦 Workshop Results\n\n`;
+
+    Object.entries(artifacts)
+      .filter(([k]) =>
+        (data.artifacts || [])
+          .map(a => a.toLowerCase().replace(/\s+/g, "_"))
+          .includes(k.toLowerCase().replace(/\s+/g, "_"))
+      )
+      .forEach(([k, v]) => {
+        const fileName = v.download_url.split("/").pop().split("?")[0]; // clean name
+        formatted += `• **${k}** → [${fileName}](${v.download_url})\n\n`;
+      });
+
+    return formatted;
+  }, []);
+
 
   const toggleExpanded = () => setIsExpanded(!isExpanded);
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
@@ -72,7 +98,7 @@ export default function SidebarWorkshop() {
     if (procStatus === "error") return "#ef4444";
     return "#6b7280";
   };
-
+  
   // Remove empty values before sending to backend
   function prune(obj) {
     if (Array.isArray(obj)) {
@@ -113,24 +139,37 @@ async function processWorkshop() {
       setProcStatus("processing");
 
       // Build payload in backend’s expected format
-      const payload = {
-        action: "workshop",
-        payload: {
-          email_id: "student1@gmail.com",
-          workshop_input: {
-            topic: (data.topic || "").trim(),
-            audience: `${data.grade || "Grade ?"} ${data.subject || ""} students`.trim(),
-            standards: data.standard ? [data.standard] : [],
-            desired_outcomes: data.notes
-              ? data.notes.split("\n").filter(Boolean)
-              : ["Students will achieve defined outcomes"],
-            required_artifacts: (data.artifacts || []).map((a) =>
-              a.toLowerCase().replace(/\s+/g, "_")
-            ),
-          },
-          huddle_id: "test-huddle-uuid-1234",
+    const payload = {
+      "action": "workshop",
+      "payload": {
+        "email_id": "mindspark.user1@schoolfuel.org",
+        "workshop_input": {
+          "topic": (data.topic || "").trim(),
+          "audience": `${data.grade || ""} ${data.subject || ""} students`.trim(),
+          "required_artifacts": (data.artifacts || []).map((a) => a.trim()),
+          "total_workshop_time": data.duration,
+          "reading_level": data.grade
         },
-      };
+        "huddle_id": "test-huddle-uuid-1234"
+      }
+    };
+
+
+  //     {
+  //     "action": "workshop",
+  //     "payload": {
+  //   "email_id": "student1@gmail.com",
+  //   "workshop_input": {
+  //     "topic": "I want a robotics related workshop that discusses how robotics can be tied to health care (specifically hospitals)",
+  //     "audience": "Grade 6 science students",
+  //     "required_artifacts": ["slides", "worksheet", "Discussion Guide", "Quiz"],
+  //     "total_workshop_time": 20,
+  //     "reading_level": "Grade 6"
+  //   },
+  //   "huddle_id": "test-huddle-uuid-1234"
+  // }
+  // }
+
 
       // Connect via WebSocket
       const ws = new WebSocket("wss://s7pmpoc37f.execute-api.us-west-1.amazonaws.com/prod");
@@ -141,32 +180,42 @@ async function processWorkshop() {
       };
 
       ws.onmessage = (event) => {
+        console.log("Raw WS event:", event.data);
         try {
           const result = JSON.parse(event.data);
-          console.log("WS result:", result);
-          setProcessed(result);
-          setProcStatus("success");
-          setStep(5); // jump to Results
+
+          // ✅ Wait until backend explicitly says "success"
+          if (result?.body?.action_response?.status === "success") {
+            setProcessed(result);
+            setProcStatus("success");
+            setStep(5);
+            ws.close(); // only close when it's done
+          } else {
+            console.log("⏳ Still processing… keeping socket open");
+            // don’t close yet, just wait for next message
+          }
         } catch (e) {
           console.error("Parse error:", e);
           setProcStatus("error");
+          ws.close();
         }
-        ws.close();
       };
 
       ws.onerror = (err) => {
         console.error("WebSocket error:", err);
         setProcStatus("error");
+        ws.close();
       };
 
       ws.onclose = () => {
         console.log("WebSocket closed");
       };
-    } catch (err) {
+
+       } catch (err) {
       console.error("Process failed:", err);
       setProcStatus("error");
     }
-  }
+  } 
 
 
   function buildResultsText(r) {
@@ -182,31 +231,53 @@ async function processWorkshop() {
     } catch {
       return JSON.stringify(r ?? {}, null, 2);
     }
+  };
+
+  function DownloadButton({ presignedUrl, filename }) {
+    const handleDownload = () => {
+      fetch(presignedUrl)
+        .then(res => res.blob())
+        .then(blob => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = filename;  // correct extension
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        })
+        .catch(err => console.error("Download failed:", err));
+    };
+
+    return (
+      <button
+        onClick={handleDownload}
+        className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+      >
+        {filename}
+      </button>
+    );
   }
 
 
 
-  async function copyResultsToClipboard() {
-    try {
-      const text = buildResultsText(processed);
-      await navigator.clipboard.writeText(text);
-    } catch (e) {
-      console.error("Copy failed:", e);
-    }
-  }
 
-  // Inserts content into the active Google Doc via Apps Script
   function insertResultsIntoDoc() {
     if (!processed) return;
-    const text = buildResultsText(processed);
-    if (window.google?.script?.run) {
-      window.google.script.run
-        .withFailureHandler((err) => console.error("Insert failed:", err))
-        .insertProcessedWorkshop(text);
-    } else {
-      console.warn("google.script.run not available in this environment.");
-    }
+    const text = formatWorkshopForCopy(processed, data);
+
+    navigator.clipboard.writeText(text).then(() => {
+      setCopySuccess("✅ Workshop results copied! You can now paste them into Google Docs.");
+      setTimeout(() => setCopySuccess(""), 4000); // Hide after 4s
+    }).catch(() => {
+      setCopySuccess("❌ Failed to copy results. Please try again.");
+      setTimeout(() => setCopySuccess(""), 4000);
+    });
   }
+
+
+
 
   // Standards filters (subject + keywords)
   const subjectOptions = Array.from(new Set((standardsData || []).map((s) => s.subject_area)));
@@ -455,8 +526,10 @@ async function processWorkshop() {
                         <strong>Standard:</strong> {data.standard || "—"}
                       </p>
                       <p>
-                        <strong>Additional Feedback:</strong> {data.notes || "—"}
+                        <strong>Additional Feedback:</strong>{" "}
+                        {data.notes && data.notes.trim() !== "" ? data.notes : "No feedback provided"}
                       </p>
+
 
                       <h5>👥 Group</h5>
                       <p>
@@ -467,26 +540,30 @@ async function processWorkshop() {
                         {data.demographics.length ? data.demographics.join(", ") : "—"}
                       </p>
 
-                      <h5>📦 Artifacts & Resources</h5>
+                      <h5>📦 Artifacts</h5>
                       <p>
-                        <strong>Artifacts:</strong>{" "}
-                        {data.artifacts.length ? data.artifacts.join(", ") : "—"}
+                        {data.artifacts.length ? data.artifacts.join(", ") : "No artifacts selected"}
                       </p>
-                      <ul>
-                        {data.resources.length ? (
-                          data.resources.map((r, i) => (
+
+                      <h5>🔗 Resources</h5>
+                      {data.resources.length ? (
+                        <ul>
+                          {data.resources.map((r, i) => (
                             <li key={i}>
-                              {r.title} — {r.url}
+                              {r.title} — <a href={r.url} target="_blank" rel="noreferrer">{r.url}</a>
                             </li>
-                          ))
-                        ) : (
-                          <li>—</li>
-                        )}
-                      </ul>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>No links provided</p>
+                      )}
+
                     </div>
 
-                    <div 
-                      className="btn-group">
+                    <div
+                      className="btn-group"
+                      style={{ display: "flex", justifyContent: "center", marginTop: 16 }}
+                    >
                       <button
                         className="submit-btn process-btn"
                         title="Send this workshop for processing"
@@ -498,76 +575,84 @@ async function processWorkshop() {
                         {procStatus === "processing" ? "Processing Workshop..." : "Process Workshop"}
                       </button>
                     </div>
+
                   </Section>
                 )}
 
                 {/* Step 6: Results */}
                 {step === 5 && (
                   <Section>
-                  <h4 className="title" style={{ marginBottom: 8 }}>
-                    Processed Results
-                  </h4>
+                    <h4 className="title" style={{ marginBottom: 8 }}>
+                      Processed Results
+                    </h4>
 
-                  {!processed ? (
-                    <div className="text-sm text-gray-500">
-                      No result available. Please run <strong>Process Workshop</strong> in Step 5.
-                    </div>
-                  ) : (
-                    <>
-                      <div
-                        className="results-box"
-                        style={{
-                          border: "1px solid #e5e7eb",
-                          borderRadius: 8,
-                          padding: 12,
-                          maxHeight: 320,
-                          overflow: "auto",
-                        }}
-                      >
-                        <h5>📦 Generated Artifacts</h5>
-                        <ul>
-                          {processed?.user_response?.artifacts &&
-                          Object.keys(processed.user_response.artifacts).length > 0 ? (
-                            Object.entries(processed.user_response.artifacts).map(([k, v]) => (
-                              <li key={k}>
-                                <strong>{k}:</strong>{" "}
-                                <a href={v.s3_uri} target="_blank" rel="noreferrer">
-                                  {v.filename || v.s3_uri}
-                                </a>
-                              </li>
-                            ))
-                          ) : (
-                            <li>—</li>
-                          )}
-                        </ul>
-
-                        <h5>📝 Editor Notes</h5>
-                        <p>
-                          {processed?.user_response?.editor_notes?.tightening_actions?.join(", ") || "—"}
-                        </p>
-                        <p>
-                          {processed?.user_response?.editor_notes?.risks?.join(", ") || "—"}
-                        </p>
+                    {!processed ? (
+                      <div className="text-sm text-gray-500">
+                        No result available. Please run <strong>Process Workshop</strong> in Step 5.
                       </div>
+                    ) : (
+                      <>
+                        <div
+                          className="results-box"
+                          style={{
+                            border: "1px solid #e5e7eb",
+                            borderRadius: 8,
+                            padding: 12,
+                            maxHeight: 320,
+                            overflow: "auto",
+                          }}
+                        >
+                          {/* Artifacts */}
+                          <h5>📦 Generated Artifacts</h5>
+                          <ul>
+                            {processed?.body?.action_response?.artifacts &&
+                            Object.keys(processed.body.action_response.artifacts).length > 0 ? (
+                              Object.entries(processed.body.action_response.artifacts)
+                                .filter(([k]) => 
+                                  (data.artifacts || [])
+                                    .map(a => a.toLowerCase().replace(/\s+/g, "_"))
+                                    .includes(k.toLowerCase().replace(/\s+/g, "_"))
+                                )
+                                .map(([k, v]) => {
+                                  const fileName = v.download_url.split("/").pop().split("?")[0];
+                                  return (
+                                    <li key={k} className="flex items-center gap-2">
+                                      <strong>{k}:</strong>{" "}
+                                      <a
+                                        href={v.download_url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-blue-600 underline"
+                                      >
+                                        {fileName}
+                                      </a>
 
-                      <div className="btn-group" style={{ marginTop: 12 }}>
-                        <button
-                          className="submit-btn process-btn"
-                          onClick={copyResultsToClipboard}
-                        >
-                          Copy to Clipboard
-                        </button>
-                        <button
-                          className="submit-btn process-btn"
-                          onClick={insertResultsIntoDoc}
-                        >
-                          Move to Docs
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </Section>
-              )}
+                                    </li>
+                                  );
+                                })
+
+                            ) : (
+                              <li>—</li>
+                            )}
+                          </ul>
+                        </div>
+
+                        {/* Buttons */}
+                        <div className="btn-group" style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+                          <button className="submit-btn process-btn" onClick={insertResultsIntoDoc}>
+                            Copy to clipboard
+                          </button>
+                        </div>
+                        {copySuccess && (
+                          <div style={{ marginTop: 10, color: "green", fontSize: "0.9rem" }}>
+                            {copySuccess}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </Section>
+                )}
+
               </div>
 
               {/* Nav buttons */}
@@ -590,6 +675,7 @@ async function processWorkshop() {
 }
 
 /* ---------- tiny presentational helpers ---------- */
+
 function Section({ children }) {
   return <div className="input-section">{children}</div>;
 }
