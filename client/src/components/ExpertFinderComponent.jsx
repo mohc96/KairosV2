@@ -94,10 +94,10 @@ export default function ExpertFinderComponent() {
 
   const getStatusConfig = () => {
     if (isLoading) return {
-      color: "text-orange-500",
-      dot: "bg-orange-400 shadow-orange-400/50",
+      color: "text-yellow-500",
+      dot: "bg-yellow-400 shadow-yellow-400/50",
       subtitle: "Searching...",
-      subtitleColor: "text-orange-600"
+      subtitleColor: "text-yellow-600"
     };
     if (error || (searchCompleted && experts.length === 0)) return {
       color: "text-red-500",
