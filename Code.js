@@ -70,8 +70,6 @@ function onOpen() {
     const response = UrlFetchApp.fetch(baseUrl, options);
     const result = JSON.parse(response.getContentText());
 
-
-    // ✅ Return the entire object — not just result.recommendation.advice
     return result;
   } catch (error) {
     Logger.log("❌ Error fetching from OpenAI Lambda:");
@@ -429,14 +427,14 @@ function getStudentProjectsForTeacher() {
   ];
 }
 
-function findExperts(message) {
+function findExperts(input) {
   const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
   const payload = {
     action: "helpme",
     payload: {
-      message: message,
-      geolocation: "Tucson, AZ", // You can make this dynamic
-      email_id: "student2@gmail.com" // Gets the current user's email
+      message: input.message,
+      geolocation: input.geolocation,
+      email_id: currentUser(),
     }
   };
   
