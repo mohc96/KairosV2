@@ -26,6 +26,20 @@ function onOpen() {
     return [];
   }
 
+  // Save selected standards in user properties
+  function receiveSelectedStandardsFromDialog(selected) {
+    const props = PropertiesService.getUserProperties();
+    props.setProperty('SELECTED_STANDARDS', JSON.stringify(selected));
+    return true
+  }
+
+  // Fetch selected standards from React sidebar
+  function getSelectedStandards() {
+    const props = PropertiesService.getUserProperties();
+    const stored = props.getProperty('SELECTED_STANDARDS');
+    return stored ? JSON.parse(stored) : [];
+  }
+
   function getLearningStandards() {
     const stored = PropertiesService.getUserProperties().getProperty('LEARNING_STANDARDS');
     return stored ? JSON.parse(stored) : null;

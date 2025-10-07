@@ -250,12 +250,9 @@
     function confirmSelection() {
       const selected = allStandards.filter(s => selectedStandards.has(s.code));
   
-      // Send standards back to sidebar via parent window
-      if (window.opener && window.opener.receiveSelectedStandards) {
-        window.opener.receiveSelectedStandards(selected);
-      }
-  
-      google.script.host.close();
+      google.script.run.withSuccessHandler(() => {
+        google.script.host.close(); // Close modal after saving
+      }).receiveSelectedStandardsFromDialog(selected);
     }
 
     function closeDialog() {

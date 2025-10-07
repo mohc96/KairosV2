@@ -1,63 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const StandardsSelector = ({ onStandardsChange, initialStandards = [] }) => {
-  const [selectedStandards, setSelectedStandards] = useState(initialStandards);
-  const [isLoading, setIsLoading] = useState(false);
+    const [selectedStandards, setSelectedStandards] = useState(initialStandards);
+    const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // Create global receiver for dialog communication
-    window.receiveSelectedStandards = function(standards) {
-      window.dispatchEvent(new CustomEvent('standardsSelected', { 
-        detail: standards 
-      }));
-    };
-    
-    // Cleanup when component unmounts
-    return () => {
-      delete window.receiveSelectedStandards;
-    };
-  }, []);
 
-  useEffect(() => {
-    // Listen for standards from dialog
-    const handleStandardsSelected = (event) => {
-      const standards = event.detail;
-      setIsLoading(false);
-      if (standards && standards.length > 0) {
-        setSelectedStandards(standards);
-        if (onStandardsChange) {
-          onStandardsChange(standards);
-        }
-      }
-    };
-    window.addEventListener('standardsSelected', handleStandardsSelected);
-    return () => {
-      window.removeEventListener('standardsSelected', handleStandardsSelected);
-    };
-  }, [onStandardsChange]);
-    
     const openStandardsDialog = () => {
     setIsLoading(true);
-    
-    google.script.run
-      .withSuccessHandler(() => {
-        // Dialog opened, waiting for user selection
-      })
-      .withFailureHandler((error) => {
+    google.script.run.withSuccessHandler(() => {
+        fetchSelectedStandards(); 
         setIsLoading(false);
-        console.error('Error opening dialog:', error);
-        alert('Error opening standards dialog. Please try again.');
-      })
-      .showStandardsDialogAndReturn();
-  };
+    }, 500).withFailureHandler((err) => {
+        console.error(err);
+        setIsLoading(false);
+    }).showStandardsDialogAndReturn();
+    };
 
-  const removeStandard = (codeToRemove) => {
-    const updated = selectedStandards.filter(s => s.code !== codeToRemove);
-    setSelectedStandards(updated);
-    if (onStandardsChange) {
-      onStandardsChange(updated);
-    }
-  };
+    const fetchSelectedStandards = () => {
+    google.script.run.withSuccessHandler((data) => {
+        setSelectedStandards(data || []);
+        if (onStandardsChange) onStandardsChange(data || []);
+    }).getSelectedStandards();
+    };
+
+
+    const removeStandard = (codeToRemove) => {
+        const updated = selectedStandards.filter(s => s.code !== codeToRemove);
+        setSelectedStandards(updated);
+        if (onStandardsChange) {
+        onStandardsChange(updated);
+        }
+    };
 
   return (
     <div className="standards-selector">
