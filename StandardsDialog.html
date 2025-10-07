@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div id="root" class="min-h-screen p-6">
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-2xl">
+      <!-- Header -->
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold text-gray-800">Select Learning Standards</h2>
+          <button onclick="closeDialog()" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Search by description or code..."
+            oninput="filterStandards()"
+            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+          />
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <div class="flex items-center gap-4 flex-wrap">
+          <div class="flex items-center gap-2">
+            <svg width="18" height="18" class="text-gray-600" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <span class="text-sm font-medium text-gray-700">Filters:</span>
+          </div>
+          
+          <select id="gradeFilter" onchange="filterStandards()" class="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+            <option value="all">All Grades</option>
+          </select>
+
+          <select id="subjectFilter" onchange="filterStandards()" class="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+            <option value="all">All Subjects</option>
+          </select>
+
+          <button onclick="clearFilters()" class="px-3 py-2 text-sm text-blue-600 hover:text-blue-700 font-medium">
+            Clear Filters
+          </button>
+
+          <div class="ml-auto text-sm text-gray-600">
+            <span id="selectedCount" class="font-semibold text-blue-600">0</span> selected
+          </div>
+        </div>
+      </div>
+
+      <!-- Standards List -->
+      <div id="standardsList" class="overflow-y-auto p-6" style="max-height: 60vh;">
+        <div class="text-center py-12 text-gray-500">
+          <p class="text-lg">Loading standards...</p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-6 border-t border-gray-200 bg-gray-50">
+        <div class="flex items-center justify-between">
+          <p id="resultsCount" class="text-sm text-gray-600">0 standards available</p>
+          <div class="flex gap-3">
+            <button onclick="closeDialog()" class="px-5 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium">
+              Cancel
+            </button>
+            <button onclick="confirmSelection()" class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm">
+              Add Standards (<span id="confirmCount">0</span>)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allStandards = [];
+    let selectedStandards = new Set();
+    let preSelectedCodes = new Set();
+
+    // Initialize dialog
+    window.onload = function() {
+      // Get pre-selected standards from opener if available
+      if (window.dialogArguments) {
+        preSelectedCodes = new Set(window.dialogArguments.map(s => s.code));
+        selectedStandards = new Set(window.dialogArguments.map(s => s.code));
+      }
+      
+      // Load standards from Apps Script
+      google.script.run
+        .withSuccessHandler(function(data) {
+          if (data && data.sheets && data.sheets[0]) {
+            allStandards = data.sheets[0].data;
+            populateFilters();
+            filterStandards();
+          } else {
+            showError('No standards data found');
+          }
+        })
+        .withFailureHandler(function(error) {
+          showError('Error loading standards: ' + error.message);
+        })
+        .getLearningStandards();
+    };
+
+    function populateFilters() {
+      const grades = [...new Set(allStandards.map(s => s.grade_level))].sort();
+      const subjects = [...new Set(allStandards.map(s => s.subject_area))].sort();
+      
+      const gradeFilter = document.getElementById('gradeFilter');
+      grades.forEach(grade => {
+        const option = document.createElement('option');
+        option.value = grade;
+        option.textContent = grade;
+        gradeFilter.appendChild(option);
+      });
+      
+      const subjectFilter = document.getElementById('subjectFilter');
+      subjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        subjectFilter.appendChild(option);
+      });
+    }
+
+    function filterStandards() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const selectedGrade = document.getElementById('gradeFilter').value;
+      const selectedSubject = document.getElementById('subjectFilter').value;
+      
+      const filtered = allStandards.filter(standard => {
+        const matchesSearch = searchTerm === '' || 
+          standard.description.toLowerCase().includes(searchTerm) ||
+          standard.code.toLowerCase().includes(searchTerm);
+        
+        const matchesGrade = selectedGrade === 'all' || standard.grade_level === selectedGrade;
+        const matchesSubject = selectedSubject === 'all' || standard.subject_area === selectedSubject;
+        
+        return matchesSearch && matchesGrade && matchesSubject;
+      });
+      
+      renderStandards(filtered);
+      updateCounts(filtered.length);
+    }
+
+    function renderStandards(standards) {
+      const container = document.getElementById('standardsList');
+      
+      if (standards.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-gray-500">
+            <svg class="mx-auto mb-4 opacity-50" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <p class="text-lg">No standards found</p>
+            <p class="text-sm">Try adjusting your filters or search term</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = standards.map(standard => {
+        const isSelected = selectedStandards.has(standard.code);
+        return `
+          <div onclick="toggleStandard('${escapeHtml(standard.code)}')" 
+               class="p-4 border-2 rounded-lg cursor-pointer transition-all mb-3 ${
+                 isSelected 
+                   ? 'border-blue-500 bg-blue-50' 
+                   : 'border-gray-200 hover:border-blue-300 bg-white'
+               }">
+            <div class="flex items-start gap-3">
+              <div class="mt-1 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                isSelected 
+                  ? 'bg-blue-500 border-blue-500' 
+                  : 'border-gray-300'
+              }">
+                ${isSelected ? '<svg width="14" height="14" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
+              </div>
+              
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2 flex-wrap">
+                  <span class="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded">
+                    ${escapeHtml(standard.grade_level)}
+                  </span>
+                  <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded">
+                    ${escapeHtml(standard.subject_area)}
+                  </span>
+                  <span class="text-xs font-mono text-gray-600">${escapeHtml(standard.code)}</span>
+                </div>
+                <p class="text-sm text-gray-700 leading-relaxed">${escapeHtml(standard.description)}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleStandard(code) {
+      if (selectedStandards.has(code)) {
+        selectedStandards.delete(code);
+      } else {
+        selectedStandards.add(code);
+      }
+      filterStandards();
+    }
+
+    function updateCounts(filteredCount) {
+      const selectedCount = selectedStandards.size;
+      document.getElementById('selectedCount').textContent = selectedCount;
+      document.getElementById('confirmCount').textContent = selectedCount;
+      document.getElementById('resultsCount').textContent = 
+        `${filteredCount} standard${filteredCount !== 1 ? 's' : ''} available`;
+    }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('gradeFilter').value = 'all';
+      document.getElementById('subjectFilter').value = 'all';
+      filterStandards();
+    }
+
+    function confirmSelection() {
+      const selected = allStandards.filter(s => selectedStandards.has(s.code));
+  
+      // Send standards back to sidebar via parent window
+      if (window.opener && window.opener.receiveSelectedStandards) {
+        window.opener.receiveSelectedStandards(selected);
+      }
+  
+      google.script.host.close();
+    }
+
+    function closeDialog() {
+      google.script.host.close();
+    }
+
+    function showError(message) {
+      document.getElementById('standardsList').innerHTML = `
+        <div class="text-center py-12 text-red-500">
+          <p class="text-lg font-semibold">Error</p>
+          <p class="text-sm">${escapeHtml(message)}</p>
+        </div>
+      `;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

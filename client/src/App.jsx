@@ -1,3 +1,10 @@
+if (typeof window !== 'undefined') {
+  window.receiveSelectedStandards = function(standards) {
+    window.dispatchEvent(new CustomEvent('standardsSelected', { 
+      detail: standards 
+    }));
+  };
+}
 import { useEffect, useState } from 'react';
 import Credentials from './components/Credentials';
 import LogoContainer from './components/LogoContainer';

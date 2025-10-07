@@ -12,42 +12,110 @@ function onOpen() {
     DocumentApp.getUi().showSidebar(html);
   }
 
+  function showStandardsDialogAndReturn() {
+    const html = HtmlService.createHtmlOutputFromFile('StandardsDialog')
+      .setWidth(900)
+      .setHeight(700);
+    
+    // Show dialog and wait for it to close
+    const ui = DocumentApp.getUi();
+    ui.showModalDialog(html, 'Select Learning Standards');
+    
+    // This will be called after dialog closes via onStandardsSelected
+    // Return empty array initially, actual data comes through callback
+    return [];
+  }
+
+  function getLearningStandards() {
+    const stored = PropertiesService.getUserProperties().getProperty('LEARNING_STANDARDS');
+    return stored ? JSON.parse(stored) : null;
+  }
+
+  function onStandardsSelected(selectedStandards) {
+    return selectedStandards;
+  }
+
+
   function currentUser()
   {
     return Session.getActiveUser().getEmail();
   }
 
   function getLearningStandards(){
-    return PropertiesService.getUserProperties('LEARNING_STANDARDS')
+    const stored = PropertiesService.getUserProperties().getProperty('LEARNING_STANDARDS');
+    return stored ? JSON.parse(stored) : null;  
   }
 
 
-  function validateUser() {
-    var user_email = currentUser();
-    const identity_url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/identity-fetch';
-    const payload = {
-      email_id: user_email,
-    };
-    const options = {
-      method: 'post',
-      contentType: 'application/json',
-      payload: JSON.stringify(payload),
-      muteHttpExceptions: true,  
-    };
+function validateUser() {
+  const userProps = PropertiesService.getUserProperties();
+  const cachedStandards = userProps.getProperty('LEARNING_STANDARDS');
+  const cachedUserId = userProps.getProperty('USER_ID');
+  const cachedRole = userProps.getProperty('USER_ROLE');
+  const cachedTimestamp = userProps.getProperty('CACHE_TIMESTAMP');
 
-    const response = UrlFetchApp.fetch(identity_url, options);
-
-    const responseText = response.getContentText();
-    const responseJson = JSON.parse(responseText);
-    if (response.getResponseCode()==200){
-      PropertiesService.getUserProperties().setProperty('USER_ID', responseJson.user_id)
-    }
+  // Check if cache exists and is still valid
+  if (cachedStandards && cachedUserId && cachedRole && !isCacheExpired(cachedTimestamp, 1)) {
+    //  Cached data is still fresh (less than 1 day old)
     return {
-      statusCode: response.getResponseCode(),
-      email: user_email,
-      role: responseJson.role
-    }
+      statusCode: 200,
+      email: currentUser(),
+      role: cachedRole,
+    };
   }
+
+  //  Cache is missing or expired → fetch fresh data
+  const user_email = currentUser();
+  const identity_url = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/dev/identity-fetch';
+  const payload = {
+    email_id: user_email,
+    request_file: "Learning_Standards.json",
+  };
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true,
+  };
+
+  const response = UrlFetchApp.fetch(identity_url, options);
+  const responseJson = JSON.parse(response.getContentText());
+
+  if (response.getResponseCode() === 200) {
+    // Save user info and fresh JSON
+    userProps.setProperty('USER_ID', responseJson.user_id);
+    userProps.setProperty('USER_ROLE', responseJson.role);
+
+    const standardsResponse = UrlFetchApp.fetch(responseJson.url);
+    const standardsJson = standardsResponse.getContentText();
+    userProps.setProperty('LEARNING_STANDARDS', standardsJson);
+
+    // Update cache timestamp
+    userProps.setProperty('CACHE_TIMESTAMP', new Date().toISOString());
+  }
+
+  return {
+    statusCode: response.getResponseCode(),
+    email: user_email,
+    role: responseJson.role,
+  };
+}
+
+/**
+ * Checks if the cache is expired.
+ * @param {string} timestamp - ISO timestamp string
+ * @param {number} maxAgeDays - cache validity period in days
+ */
+function isCacheExpired(timestamp, maxAgeDays) {
+  if (!timestamp) return true; // No timestamp = expired
+  const now = new Date();
+  const last = new Date(timestamp);
+  const diffMs = now - last;
+  const maxMs = maxAgeDays * 24 * 60 * 60 * 1000; // Convert days → ms
+  return diffMs > maxMs;
+}
+
+
   function getAdvice(prompt) {
   const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke';
 
