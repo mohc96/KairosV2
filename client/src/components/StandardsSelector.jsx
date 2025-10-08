@@ -6,15 +6,60 @@ const StandardsSelector = ({ onStandardsChange, initialStandards = [] }) => {
 
 
     const openStandardsDialog = () => {
-    setIsLoading(true);
-    google.script.run.withSuccessHandler(() => {
-        fetchSelectedStandards(); 
-        setIsLoading(false);
-    }, 500).withFailureHandler((err) => {
+  setIsLoading(true);
+  
+  // FIRST: Clear any previous cached data
+  google.script.run
+    .withSuccessHandler(() => {
+      // THEN: Open the dialog
+      google.script.run
+        .withSuccessHandler(() => {
+          // Start polling for NEW results
+          pollForResults();
+        })
+        .withFailureHandler((err) => {
+          console.error(err);
+          setIsLoading(false);
+        })
+        .showStandardsDialogAndReturn();
+    })
+    .withFailureHandler((err) => {
+      console.error(err);
+      setIsLoading(false);
+    })
+    .clearSelectedStandards(); // New function to clear cache
+};
+
+const pollForResults = () => {
+  let attempts = 0;
+  const maxAttempts = 60;
+  
+  const checkForResults = () => {
+    google.script.run
+      .withSuccessHandler((data) => {
+        if (data && data.length > 0) {
+          // Got NEW results!
+          setSelectedStandards(data);
+          if (onStandardsChange) onStandardsChange(data);
+          setIsLoading(false);
+        } else if (attempts < maxAttempts) {
+          // No results yet, keep polling
+          attempts++;
+          setTimeout(checkForResults, 1000);
+        } else {
+          // Timeout - user closed without selecting
+          setIsLoading(false);
+        }
+      })
+      .withFailureHandler((err) => {
         console.error(err);
         setIsLoading(false);
-    }).showStandardsDialogAndReturn();
-    };
+      })
+      .getSelectedStandards();
+  };
+  
+  setTimeout(checkForResults, 1000);
+};
 
     const fetchSelectedStandards = () => {
     google.script.run.withSuccessHandler((data) => {

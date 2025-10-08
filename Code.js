@@ -32,7 +32,10 @@ function onOpen() {
     props.setProperty('SELECTED_STANDARDS', JSON.stringify(selected));
     return true
   }
-
+  function clearSelectedStandards() {
+  PropertiesService.getUserProperties().deleteProperty('SELECTED_STANDARDS');
+  return true;
+  }
   // Fetch selected standards from React sidebar
   function getSelectedStandards() {
     const props = PropertiesService.getUserProperties();
