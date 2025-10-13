@@ -19,7 +19,7 @@ function onOpen() {
     
     // Show dialog and wait for it to close
     const ui = DocumentApp.getUi();
-    ui.showModalDialog(html, 'Select Learning Standards');
+    ui.showModalDialog(html,'\u200B');
     
     // This will be called after dialog closes via onStandardsSelected
     // Return empty array initially, actual data comes through callback
