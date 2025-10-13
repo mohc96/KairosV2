@@ -11,6 +11,7 @@
     }
     .line-clamp-2 {
       display: -webkit-box;
+      line-clamp: 2;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
@@ -256,7 +257,12 @@
     }
 
     function closeDialog() {
-      google.script.host.close();
+      google.script.run
+        .withSuccessHandler(function() {
+          google.script.host.close();
+        })
+        .onDialogClosedWithoutSelection();
+      // google.script.host.close();
     }
 
     function showError(message) {

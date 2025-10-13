@@ -30,11 +30,28 @@ function onOpen() {
   function receiveSelectedStandardsFromDialog(selected) {
     const props = PropertiesService.getUserProperties();
     props.setProperty('SELECTED_STANDARDS', JSON.stringify(selected));
+    props.setProperty('DIALOG_STATUS', 'selected');
     return true
   }
-  function clearSelectedStandards() {
-  PropertiesService.getUserProperties().deleteProperty('SELECTED_STANDARDS');
+  function onDialogClosedWithoutSelection() {
+  // Mark that dialog was closed without selection
+  PropertiesService.getUserProperties().setProperty('DIALOG_STATUS', 'closed');
   return true;
+  }
+  function getDialogStatus() {
+    const props = PropertiesService.getUserProperties();
+    const status = props.getProperty('DIALOG_STATUS');
+    if (status) {
+      props.deleteProperty('DIALOG_STATUS'); // Clear after reading
+      return status;
+    }
+    return null;
+  }
+  function clearSelectedStandards() {
+    const props = PropertiesService.getUserProperties();
+    props.deleteProperty('SELECTED_STANDARDS');
+    props.deleteProperty('DIALOG_STATUS');
+    return true;
   }
   // Fetch selected standards from React sidebar
   function getSelectedStandards() {
