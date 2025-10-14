@@ -75,11 +75,6 @@ function onOpen() {
     return Session.getActiveUser().getEmail();
   }
 
-  function getLearningStandards(){
-    const stored = PropertiesService.getUserProperties().getProperty('LEARNING_STANDARDS');
-    return stored ? JSON.parse(stored) : null;  
-  }
-
 
 function validateUser() {
   const userProps = PropertiesService.getUserProperties();
