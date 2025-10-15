@@ -8,11 +8,11 @@ const StandardsSelector = ({ onStandardsChange, initialStandards = [] }) => {
 
     const openStandardsDialog = () => {
       setIsLoading(true);
-      
       google.script.run
         .withSuccessHandler(() => {
           google.script.run
             .withSuccessHandler(() => {
+              setIsLoading(false);
               pollForResults();
             })
             .withFailureHandler((err) => {
@@ -31,7 +31,6 @@ const StandardsSelector = ({ onStandardsChange, initialStandards = [] }) => {
     const pollForResults = () => {
       let attempts = 0;
       const maxAttempts = 60;
-      
       const checkForResults = () => {
         google.script.run
           .withSuccessHandler((status) => {
