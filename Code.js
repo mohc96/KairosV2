@@ -456,8 +456,35 @@ function findExperts(input) {
   }
 }
 
-function submitFormToScript(payload){
-  Logger.log(payload)
+function submitAboutMeInfo(input){
+  const baseUrl = 'https://a3trgqmu4k.execute-api.us-west-1.amazonaws.com/prod/invoke'
+
+  const payload = {
+    action: "aboutme",
+    payload: input
+  };
+
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+  try {
+    const response = UrlFetchApp.fetch(baseUrl, options);
+    const result = JSON.parse(response.getContentText());
+    Logger.log(result);
+    if (result.status == 'success'){
+      Logger.log('✅ About Me info submitted successfully.');
+      return { success: true, message: result.action_response.message };
+    } else{
+      Logger.log('❌ Failed to submit About Me info: ' + JSON.stringify(result));
+      return { success: false, message: result.action_response?.message || 'Unknown error' };
+    }
+  } catch (error) {
+    Logger.log('Error submitting about me info: ' + error.toString());
+    throw error;
+  }
 }
 
 function callMorningPulseAPI(payload) {
