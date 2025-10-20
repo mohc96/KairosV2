@@ -82,51 +82,41 @@ export default function AboutMe() {
     setSubmitStatus(null);
 
     const payload = {
-      action: "aboutme",
-      payload: {
         email_id: formData.email_id,
         bio: formData.bio,
         interests: formData.interests,
         skills: formData.skills,
         endorsements: formData.endorsements,
         invitation: formData.invitation
-      }
     };
-
-    // Simulating the Google Apps Script call for demo
-    setTimeout(() => {
-      setSubmitStatus('success');
-      setFormData({
-        email_id: '',
-        bio: '',
-        interests: [],
-        skills: [],
-        endorsements: [],
-        invitation: []
-      });
-      setIsSubmitting(false);
-    }, 2000);
 
     google.script.run
       .withSuccessHandler((result) => {
-        setSubmitStatus('success');
-        setFormData({
-          email_id: '',
-          bio: '',
-          interests: [],
-          skills: [],
-          endorsements: [],
-          invitation: []
-        });
-        console.log('Success:', result);
+        if (result.success || result.status === 'success') {
+          // API returned success
+          setSubmitStatus('success');
+          setFormData({
+            email_id: '',
+            bio: '',
+            interests: [],
+            skills: [],
+            endorsements: [],
+            invitation: []
+          });
+          console.log('✅ Success:', result);
+        } else {
+          // API ran but returned an error status
+          console.error('❌ API returned failure:', result);
+          setSubmitStatus('error');
+        }
         setIsSubmitting(false);
       })
       .withFailureHandler((error) => {
-        console.error('Error calling Apps Script:', error);
+        console.error('Error submitting info:', error);
         setSubmitStatus('error');
         setIsSubmitting(false);
       })
-      .submitFormToScript(payload);
+      .submitAboutMeInfo(payload);
   };
 
   const toggleExpanded = () => {
