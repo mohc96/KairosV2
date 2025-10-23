@@ -4,7 +4,7 @@ import { FolderPlus, ChevronDown, RefreshCw, CheckCircle2, Circle, Loader2 } fro
 import ProjectDialog from './ProjectDialog';
 import ProjectControls from './ProjectControls';
 import LockConfirmationDialog from './LockConfirmationDialog';
-import useProjectEditor from '../../hooks/useProjectEditor';
+import useProjectEditor from '../../../hooks/useProjectEditor';
 import ProjectViewer from './ProjectViewer';
 
 // Streaming state management with useReducer

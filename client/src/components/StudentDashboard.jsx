@@ -1,13 +1,13 @@
 import IntroductionContainer from './IntroductionContainer';
-import SidebarAdvice from './Advice';
-import SidebarBreakTimer from './Break';
+import SidebarAdvice from './Student/Advice/Advice';
+import SidebarBreakTimer from './Student/Break/Break';
 import AboutMe from './AboutMe';
 import GuideMe from './GuideMe';
-import StudentProjects from './StudentProjects/StudentProjects';
+import StudentProjects from './Student/StudentProjects/StudentProjects';
 import SidebarMorningPulse from './MorningPulse';
-import CreateProject from './CreateProject/CreateProject';
+import CreateProject from './Student/CreateProject/CreateProject';
 import SidebarWorkshop from './WorkshopBuilder';
-import ExpertFinderComponent from './ExpertFinderComponent';
+import ExpertFinderComponent from './Student/FindExperts/ExpertFinderComponent';
 
 export default function StudentDashboard({ email }) {
   return (
