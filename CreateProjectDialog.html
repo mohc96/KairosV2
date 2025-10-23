@@ -187,12 +187,6 @@
                 </span>
               </div>
             </div>
-            <button onclick="closeDialog()" class="text-gray-400 hover:text-gray-600 transition-colors">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
           </div>
         </div>
 
@@ -476,9 +470,9 @@
       stage.gate.checklist.forEach((item, index) => {
         html += `
           <div class="flex items-center gap-2 text-sm">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600">
+            <polyline points="13 4 6 11 3 8"></polyline>
+          </svg>
             <span>${escapeHtml(item)}</span>
           </div>
         `;
