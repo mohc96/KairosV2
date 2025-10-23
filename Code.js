@@ -12,6 +12,17 @@ function onOpen() {
     DocumentApp.getUi().showSidebar(html);
   }
 
+  function showCreateProjectDialog(){
+    const html = HtmlService.createHtmlOutputFromFile('CreateProjectDialog')
+      .setWidth(900)
+      .setHeight(700);
+    
+    // Show dialog and wait for it to close
+    const ui = DocumentApp.getUi();
+    ui.showModalDialog(html,'Create Project');
+
+  }
+
   function showStandardsDialogAndReturn() {
     const html = HtmlService.createHtmlOutputFromFile('StandardsDialog')
       .setWidth(900)
