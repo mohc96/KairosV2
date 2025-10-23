@@ -39,10 +39,10 @@
 </head>
 <body class="bg-gray-50">
   <div id="app" class="min-h-screen p-6">
-    <div class="max-w-7xl mx-auto">
+    <div class="w-full mx-auto">
       
       <!-- Initial Form View -->
-      <div id="inputForm" class="bg-white rounded-xl shadow-2xl max-w-2xl mx-auto">
+      <div id="inputForm" class="bg-white rounded-xl shadow-2xl w-full mx-auto">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center justify-between mb-2">
             <div class="flex items-center gap-3">
@@ -53,17 +53,7 @@
                   <line x1="9" y1="14" x2="15" y2="14"></line>
                 </svg>
               </div>
-              <div>
-                <h2 class="text-2xl font-bold text-gray-900">Create New Project</h2>
-                <p class="text-sm text-gray-500">Build something amazing with AI guidance</p>
-              </div>
             </div>
-            <button onclick="closeDialog()" class="text-gray-400 hover:text-gray-600 transition-colors">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
           </div>
         </div>
 
@@ -131,7 +121,7 @@
       </div>
 
       <!-- Loading View -->
-      <div id="loadingView" class="hidden bg-white rounded-xl shadow-2xl max-w-2xl mx-auto animate-slide-in">
+      <div id="loadingView" class="hidden bg-white rounded-xl shadow-2xl w-full mx-auto animate-slide-in">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center">
