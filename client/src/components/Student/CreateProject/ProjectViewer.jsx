@@ -1,6 +1,6 @@
 import React from 'react';
 import { Lightbulb, ChevronDown, ChevronRight, Check } from 'lucide-react';
-import InlineEditableField from '../../InlineEditableField';
+import InlineEditableField from './InlineEditableField';
 
 const ProjectViewer = ({ 
   projectOutput, 

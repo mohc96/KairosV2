@@ -1,4 +1,4 @@
-import IntroductionContainer from './IntroductionContainer';
+import IntroductionContainer from './Shared/IntroductionContainer';
 import SidebarAdvice from './Student/Advice/Advice';
 import SidebarBreakTimer from './Student/Break/Break';
 import AboutMe from './AboutMe';

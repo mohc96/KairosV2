@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import Credentials from './components/Credentials';
-import LogoContainer from './components/LogoContainer';
+import Credentials from './components/Shared/Credentials';
+import LogoContainer from './components/Shared/LogoContainer';
 import StudentDashboard from './components/StudentDashboard';
 import TeacherDashboard from './components/TeacherDashboard';
-import UnauthorizedUser from './components/UnauthorizedUser';
+import UnauthorizedUser from './components/Shared/UnauthorizedUser';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Loader from './components/Loader';
+import Loader from './components/Shared/Loader';
 
 export default function App() {
   const [isAuthorized, setIsAuthorized] = useState(null);
