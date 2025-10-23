@@ -8,7 +8,7 @@ import SidebarMorningPulse from './MorningPulse';
 import CreateProject from './Student/CreateProject/CreateProject';
 import SidebarWorkshop from './WorkshopBuilder';
 import ExpertFinderComponent from './Student/FindExperts/ExpertFinderComponent';
-import StandardsSelector from './StandardsSelector';
+import StandardsSelector from './Student/StandardsSelector';
 
 export default function StudentDashboard({ email }) {
   return (
