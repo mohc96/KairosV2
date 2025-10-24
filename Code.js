@@ -143,3 +143,9 @@ function isCacheExpired(timestamp, maxAgeDays) {
   const maxMs = maxAgeDays * 24 * 60 * 60 * 1000; // Convert days → ms
   return diffMs > maxMs;
 }
+function showCustomDialog() {
+  const html = HtmlService.createHtmlOutputFromFile('Dialog')
+    .setWidth(900)
+    .setHeight(700);
+  DocumentApp.getUi().showModalDialog(html, 'Custom Dialog');
+}
