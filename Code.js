@@ -143,9 +143,19 @@ function isCacheExpired(timestamp, maxAgeDays) {
   const maxMs = maxAgeDays * 24 * 60 * 60 * 1000; // Convert days → ms
   return diffMs > maxMs;
 }
-function showCustomDialog() {
+
+function openDialog(dialogType, title){
   const html = HtmlService.createHtmlOutputFromFile('Dialog')
     .setWidth(900)
     .setHeight(700);
-  DocumentApp.getUi().showModalDialog(html, 'Custom Dialog');
+  
+  // Set the hash BEFORE opening the dialog
+  const htmlWithHash = html.getContent();
+  const modifiedHtml = HtmlService.createHtmlOutput(
+    htmlWithHash.replace('<body>', `<body><script>window.location.hash = '${dialogType}';</script>`)
+  )
+    .setWidth(900)
+    .setHeight(700);
+  
+  DocumentApp.getUi().showModalDialog(modifiedHtml, title);
 }
