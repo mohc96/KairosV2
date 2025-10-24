@@ -137,7 +137,7 @@ const StandardsSelector = ({ onStandardsChange, initialStandards = [] }) => {
 
       {/* Enhanced Add Button */}
       <button
-        onClick={openNormalDialog}
+        onClick={openStandardsDialog}
         disabled={isLoading}
         className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all duration-150 text-sm font-semibold shadow-sm hover:shadow disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
       >
