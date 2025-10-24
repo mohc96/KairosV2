@@ -1,0 +1,26 @@
+.LogoContainer
+{
+    display: flex;
+    user-select: none;
+    padding-left: 3%;
+}
+.quotebox{
+    width: 65%;
+    padding-top: 20px;
+    padding-left: 20px;
+    font-size: 14px;
+    align-content: center;
+}
+.quotebox p{
+    font-weight: 600;
+
+}
+.logobox{
+    width:100%;
+    height:130px;
+    
+}
+.logobox img{
+    width: 120px;
+    height: 120px;
+}
