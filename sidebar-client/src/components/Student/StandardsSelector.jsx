@@ -6,6 +6,7 @@ const StandardsSelector = ({ onStandardsChange, initialStandards = [] }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isExpanded, setIsExpanded] = useState(true);
 
+
     const openStandardsDialog = () => {
       setIsLoading(true);
       google.script.run
@@ -19,7 +20,7 @@ const StandardsSelector = ({ onStandardsChange, initialStandards = [] }) => {
               console.error(err);
               setIsLoading(false);
             })
-            .showStandardsDialogAndReturn();
+            .openDialog("student-standards","Learning Standards");
         })
         .withFailureHandler((err) => {
           console.error(err);
@@ -27,6 +28,7 @@ const StandardsSelector = ({ onStandardsChange, initialStandards = [] }) => {
         })
         .clearSelectedStandards(); 
     };
+
 
     const pollForResults = () => {
       let attempts = 0;

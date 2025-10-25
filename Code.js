@@ -12,20 +12,6 @@ function onOpen() {
     DocumentApp.getUi().showSidebar(html);
   }
 
-  function showStandardsDialogAndReturn() {
-    const html = HtmlService.createHtmlOutputFromFile('StandardsDialog')
-      .setWidth(900)
-      .setHeight(700);
-    
-    // Show dialog and wait for it to close
-    const ui = DocumentApp.getUi();
-    ui.showModalDialog(html,'Select Learning Standards');
-    
-    // This will be called after dialog closes via onStandardsSelected
-    // Return empty array initially, actual data comes through callback
-    return [];
-  }
-
   // Save selected standards in user properties
   function receiveSelectedStandardsFromDialog(selected) {
     const props = PropertiesService.getUserProperties();
@@ -142,4 +128,20 @@ function isCacheExpired(timestamp, maxAgeDays) {
   const diffMs = now - last;
   const maxMs = maxAgeDays * 24 * 60 * 60 * 1000; // Convert days → ms
   return diffMs > maxMs;
+}
+
+function openDialog(dialogType, title){
+  const html = HtmlService.createHtmlOutputFromFile('Dialog')
+    .setWidth(900)
+    .setHeight(700);
+  
+  // Set the hash BEFORE opening the dialog
+  const htmlWithHash = html.getContent();
+  const modifiedHtml = HtmlService.createHtmlOutput(
+    htmlWithHash.replace('<body>', `<body><script>window.location.hash = '${dialogType}';</script>`)
+  )
+    .setWidth(900)
+    .setHeight(700);
+  
+  DocumentApp.getUi().showModalDialog(modifiedHtml, title);
 }
