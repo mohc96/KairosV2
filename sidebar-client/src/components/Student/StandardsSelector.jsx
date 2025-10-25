@@ -6,20 +6,6 @@ const StandardsSelector = ({ onStandardsChange, initialStandards = [] }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isExpanded, setIsExpanded] = useState(true);
 
-    const openNormalDialog = ()=>{
-      try{
-        google.script.run
-          .withSuccessHandler(()=>{
-            console.log("Mission STEM OPT")
-          })
-          .withFailureHandler((err) => {
-              console.error(err);
-            })
-            .openDialog("dashboard","Student Dashboard")()
-      }catch(err){
-        console.log("another error: ", err)
-      }
-    }
 
     const openStandardsDialog = () => {
       setIsLoading(true);
@@ -137,12 +123,6 @@ const StandardsSelector = ({ onStandardsChange, initialStandards = [] }) => {
       `}</style>
 
       {/* Enhanced Add Button */}
-        <button
-        onClick={openNormalDialog}
-        className="w-full px-4 py-3 mb-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all duration-150 text-sm font-semibold shadow-sm hover:shadow disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
-      >
-            <span>Open Dashboard</span>
-      </button>
       <button
         onClick={openStandardsDialog}
         disabled={isLoading}

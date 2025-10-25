@@ -9,7 +9,6 @@ import CreateProject from './Student/CreateProject/CreateProject';
 import SidebarWorkshop from './WorkshopBuilder';
 import ExpertFinderComponent from './Student/FindExperts/ExpertFinderComponent';
 import StandardsSelector from './Student/StandardsSelector';
-import CreateProjectDialog from './Student/CreateProject/CreateProjectDialog';
 
 export default function StudentDashboard({ email }) {
   return (
@@ -25,7 +24,6 @@ export default function StudentDashboard({ email }) {
       <AboutMe />
       <SidebarBreakTimer />
       <StandardsSelector />
-      <CreateProjectDialog />
     </div>
   );
 }

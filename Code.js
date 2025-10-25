@@ -12,31 +12,6 @@ function onOpen() {
     DocumentApp.getUi().showSidebar(html);
   }
 
-  function showCreateProjectDialog(){
-    const html = HtmlService.createHtmlOutputFromFile('CreateProjectDialog')
-      .setWidth(900)
-      .setHeight(700);
-    
-    // Show dialog and wait for it to close
-    const ui = DocumentApp.getUi();
-    ui.showModalDialog(html,'Create Project');
-
-  }
-
-  function showStandardsDialogAndReturn() {
-    const html = HtmlService.createHtmlOutputFromFile('StandardsDialog')
-      .setWidth(900)
-      .setHeight(700);
-    
-    // Show dialog and wait for it to close
-    const ui = DocumentApp.getUi();
-    ui.showModalDialog(html,'Select Learning Standards');
-    
-    // This will be called after dialog closes via onStandardsSelected
-    // Return empty array initially, actual data comes through callback
-    return [];
-  }
-
   // Save selected standards in user properties
   function receiveSelectedStandardsFromDialog(selected) {
     const props = PropertiesService.getUserProperties();
