@@ -2,4 +2,3 @@ node_modules
 .clasp.json
 Sidebar.html
 Dialog.html
-build.sh
